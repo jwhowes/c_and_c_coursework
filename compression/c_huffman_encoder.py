@@ -14,7 +14,7 @@ A = np.zeros((2**(character_bits + 1)), dtype=int)
 max_heap_length = 2**character_bits
 
 for i in m:
-	A[i + 256] += 1
+	A[i + max_heap_length] += 1
 
 heap_length = 0
 def heapify():
@@ -55,18 +55,32 @@ def add_to_heap(value):
 			break
 	heap_length += 1
 
-for i in range(256):
-	add_to_heap(i + 256)
+for i in range(max_heap_length):
+	add_to_heap(i + max_heap_length)
 
-lengths = np.zeros((2**character_bits), dtype=int)
+#A = [13, 11, 12, 9, 10, 8, 7, 25, 20, 13, 17, 9, 11, 5]
+#heap_length = 7
 
 while heap_length > 1:
 	a = A[0]
 	heapify()
 	b = A[0]
 	heapify()
-	# we're combining a and b
-	A[heap_length + 2] = A[a] + A[b]
-	A[a] = heap_length + 2
-	A[b] = heap_length + 2
-	add_to_heap(heap_length)
+	A[heap_length + 1] = A[a] + A[b]
+	A[a] = heap_length + 1
+	A[b] = heap_length + 1
+	add_to_heap(heap_length + 1)
+
+# Not entirely sure how to retrieve lengths from this. Will need to figure it out
+# Below is my best guess
+# I don't think it's working
+	# It's producing lengths of 64 for |L| = 256
+	# Not sure if it's the stuff below or the stuff above that isn't working
+
+lengths = np.ones((max_heap_length), dtype=int)
+
+for i in range(max_heap_length):
+	v = A[i + max_heap_length]
+	while v != 1:
+		lengths[i] += 1
+		v = A[v]
