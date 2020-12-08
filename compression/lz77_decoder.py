@@ -20,16 +20,18 @@ for i in b:
 	enc += np.binary_repr(i).zfill(character_bits)
 
 def lz77_decode(enc):
-	m = ""
+	m = bytearray()
 	for j in range(0, len(enc), W_bits + L_bits + character_bits):
 		if enc[j + W_bits + L_bits : j + W_bits + L_bits + character_bits] != "":
 			i = len(m)
 			d = int(enc[j : j + W_bits], 2)
 			l = int(enc[j + W_bits : j + W_bits + L_bits], 2)
-			c = chr(int(enc[j + W_bits + L_bits : j + W_bits + L_bits + character_bits], 2))
-			m += m[i - d : i - d + l] + c
+			c = int(enc[j + W_bits + L_bits : j + W_bits + L_bits + character_bits], 2)
+			m += m[i - d : i - d + l]
+			m.append(c)
 	return m
 
-ofile = open("out.tex", "w")
-ofile.write(lz77_decode(enc))
+dec = lz77_decode(enc)
+ofile = open("out.tex", "w", newline='\n')
+ofile.write(str(dec, encoding="utf-8"))
 ofile.close()

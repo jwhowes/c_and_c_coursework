@@ -4,7 +4,7 @@ import sys
 import json
 from bitstring import *
 
-ifile = open("in.tex", "r")
+ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -30,7 +30,7 @@ def lz77_encode(m):
 				best_d = d
 		d = np.binary_repr(best_d)
 		l = np.binary_repr(best_l)
-		c = np.binary_repr(ord(m[i + best_l]))
+		c = np.binary_repr(m[i + best_l])
 		while len(d) < W_bits:
 			d = '0' + d
 		while len(l) < L_bits:
