@@ -123,5 +123,3 @@ enc = np.binary_repr(length_bits).zfill(character_bits) + enc
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()
-
-codewords = dict([(v, k) for k, v in codewords.items()])
