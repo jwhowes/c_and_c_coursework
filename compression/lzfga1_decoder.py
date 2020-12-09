@@ -15,7 +15,7 @@ copy_length_bits = copy_bits - copy_depth_bits
 
 character_bits = 8
 
-ifile = open("compressed.lz", "rb")
+ifile = open("huffman_out.lz", "rb")
 b = ifile.read()
 ifile.close()
 

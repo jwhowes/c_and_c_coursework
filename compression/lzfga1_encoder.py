@@ -59,6 +59,6 @@ if len(literal_string) > 0:
 	for j in literal_string:
 		enc += np.binary_repr(ord(j)).zfill(character_bits)
 
-ofile = open('compressed.lz', 'wb')
+ofile = open('huffman_in.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()
