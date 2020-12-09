@@ -46,14 +46,28 @@ def add_to_heap(value):
 		parent = v // 2
 	heap_length += 1
 
-A = np.zeros((2**(character_bits + 1)), dtype=int)
 frequency = np.zeros((2**character_bits), dtype=int)
 for i in m:
-	A[i + num_characters] += 1
 	frequency[i] += 1
 
+alphabet_size = 0
+for i in frequency:
+	if i > 0:
+		alphabet_size += 1
+
+A = np.zeros((alphabet_size * 2), dtype=int)
+
+c = 0
 for i in range(num_characters):
-	add_to_heap(i + num_characters)
+	if frequency[i] > 0:
+		A[c + alphabet_size] = frequency[i]
+		c += 1
+
+c = 0
+for i in range(num_characters):
+	if frequency[i] > 0:
+		add_to_heap(c + alphabet_size)
+		c += 1
 
 while heap_length > 1:
 	a = A[0]
@@ -67,15 +81,15 @@ while heap_length > 1:
 	heap_length += 1
 	heapify()
 
-lengths = np.ones((num_characters), dtype=int)
+lengths = np.ones((alphabet_size), dtype=int)
 
-for i in range(num_characters):
-	v = A[i + num_characters]
+for i in range(alphabet_size):
+	v = A[i + alphabet_size]
 	while v != 1:
 		lengths[i] += 1
 		v = A[v]
 
-D1_codewords = {k: "" for k in sorted(list(range(num_characters)), key=lambda x: lengths[x])}
+D1_codewords = {k: "" for k in sorted(list(range(alphabet_size)), key=lambda x: lengths[x])}
 
 max_length = lengths.max()
 numl = np.zeros((max_length + 1), dtype=int)
@@ -95,13 +109,6 @@ for i in D1_codewords:
 	D1_codewords[i] = np.binary_repr(num).zfill(lengths[i])
 	num += 1
 
-# Adjust max_length so bytes with frequency 0 aren't included
-max_length = 0
-for i in range(num_characters):
-	if frequency[i] > 0 and lengths[i] > max_length:
-		max_length = lengths[i]
-		l = i
-
 D1_length_bits = math.ceil(math.log(max_length, 2))
 D1_length_encoding = ""
 #length_skip_bits = 4
@@ -119,17 +126,29 @@ tot_num_skipped = 0
 #		D1_length_encoding += "1" + np.binary_repr(num_skipped - 1).zfill(length_skip_bits)
 #	if frequency[i] == 0:
 #		D1_length_encoding += "0" + np.binary_repr(lengths[i]).zfill(D1_length_bits)
+c = 0
 for i in range(num_characters):
+	if c >= alphabet_size:
+		break
 	if frequency[i] == 0:
-		D1_length_encoding += "0"
+		D1_length_encoding += "1"
 	else:
-		D1_length_encoding += "0" + np.binary_repr(lengths[i]).zfill(D1_length_bits)
-D1_length_encoding = np.binary_repr(D1_length_bits).zfill(character_bits) + D1_length_encoding
+		D1_length_encoding += "0" + np.binary_repr(lengths[c]).zfill(D1_length_bits)
+		c += 1
+D1_length_encoding = np.binary_repr(alphabet_size).zfill(character_bits) + np.binary_repr(D1_length_bits).zfill(character_bits) + D1_length_encoding
 
-print(len(D1_length_encoding)/8)
-
-# D1_length_encoding now stores the string for encoding the D1 dictionary (should be prepended to enc after lzfga1 is done)
-# D1_codewords now stores the codeword for each symbol
+# D1_length_encoding now stores the string for encoding D1 (should be prepended to enc after lzfga1 is done)
+# D1_codewords now stores the D1 codeword for each symbol
+# Consider adding a flag to mark the end (i.e. from this point, all frequencies are 0)
+	# An idea would be to put an 8-bit number saying total number of non-zero frequency bytes, then once that many are read decoder knows it's the end
+# Format of D1 encoding:
+	# First 8 bits is size of the alphabet
+	# Next 8 bits is number of bits dedicated to encoding the length of a character's codeword
+	# Next few bits is each character's encoding like so:
+		# If a character's frequency is 0, it is encoded with a single 1
+		# If a character's frequency is > 0, it is encoded with a 0 followed by it's length (encoded in length_bits bits)
+	# Once all characters from the alphabet are encoded (which the decoder will know as it knows the alphabet length), the alphabet encoded simply stops (as all remaining characters have frequency 0)
+	# From this data, the decoder should be able to retrieve all bytes that have frequency > 0 (the alphabet) and the length of the encoding of each character in the alphabet which should be enough data to compute the codewords for each character
 
 literal_bits = 8
 max_literal_length = 16
