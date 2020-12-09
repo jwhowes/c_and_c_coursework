@@ -111,8 +111,6 @@ enc = ""
 for i in m:
 	enc += codewords[i]
 
-print(enc[:20])
-
 length_bits = math.ceil(math.log(max_length, 2))
 length_encoding = ""
 for i in lengths:
