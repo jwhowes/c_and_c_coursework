@@ -17,17 +17,6 @@ for i in m:
 	A[i + num_characters] += 1
 
 heap_length = 0
-def heap_satisfied():
-	for i in range(heap_length):
-		v = i + 1
-		if 2*v < heap_length:
-			if A[A[2*v - 1]] < A[A[v - 1]]:
-				return False
-		if 2*v + 1 < heap_length:
-			if A[A[2*v]] < A[A[v - 1]]:
-				return False
-	return True
-
 def heapify():
 	global heap_length
 	v = 1

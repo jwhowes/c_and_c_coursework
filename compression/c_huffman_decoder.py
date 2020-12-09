@@ -5,7 +5,6 @@ import json
 from bitstring import *
 
 character_bits = 8
-
 num_characters = 2**character_bits
 
 ifile = open("compressed.lz", "rb")
