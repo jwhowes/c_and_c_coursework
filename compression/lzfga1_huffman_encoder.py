@@ -89,9 +89,18 @@ for i in range(alphabet_size):
 		lengths[i] += 1
 		v = A[v]
 
-D1_codewords = {k: "" for k in sorted(list(range(alphabet_size)), key=lambda x: lengths[x])}
-
 max_length = lengths.max()
+length_sort_key = np.zeros((num_characters), dtype=int)
+c = 0
+for i in range(num_characters):
+	if frequency[i] > 0:
+		length_sort_key[i] = lengths[c]
+		c += 1
+	else:
+		length_sort_key[i] = max_length + 1
+	
+D1_codewords = {k: "" for k in sorted(list(range(num_characters)), key=lambda x: length_sort_key[x])}
+
 numl = np.zeros((max_length + 1), dtype=int)
 for i in lengths:
 	numl[i] += 1
@@ -103,11 +112,12 @@ for i in range(max_length - 1, 0, -1):
 
 l = -1
 for i in D1_codewords:
-	if lengths[i] != l:
-		l = lengths[i]
-		num = first[l]
-	D1_codewords[i] = np.binary_repr(num).zfill(lengths[i])
-	num += 1
+	if length_sort_key[i] != max_length + 1:
+		if length_sort_key[i] != l:
+			l = length_sort_key[i]
+			num = first[l]
+		D1_codewords[i] = np.binary_repr(num).zfill(length_sort_key[i])
+		num += 1
 
 D1_length_bits = math.ceil(math.log(max_length, 2))
 D1_length_encoding = ""
