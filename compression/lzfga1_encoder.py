@@ -14,7 +14,7 @@ search_buffer_size = int(2**(copy_bits - math.log(max_literal_length, 2)))
 copy_depth_bits = int(copy_bits - math.log(max_literal_length, 2))
 copy_length_bits = copy_bits - copy_depth_bits
 
-character_bits = 8
+character_bits = 7
 
 literal_string = ""
 
@@ -59,6 +59,6 @@ if len(literal_string) > 0:
 	for j in literal_string:
 		enc += np.binary_repr(ord(j)).zfill(character_bits)
 
-ofile = open('huffman_in.lz', 'wb')
+ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()

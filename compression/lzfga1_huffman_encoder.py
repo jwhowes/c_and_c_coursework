@@ -192,7 +192,7 @@ while i < len(m):
 		literal_token += np.binary_repr(len(literal_string) - 1).zfill(literal_length_bits)
 		enc += literal_token
 		for j in literal_string:
-			enc += np.binary_repr(ord(j)).zfill(character_bits)
+			enc += D1_codewords[ord(j)]
 		literal_string = ""
 	if best_l >= 2:
 		length = np.binary_repr(best_l - 1).zfill(copy_length_bits)
@@ -207,7 +207,9 @@ if len(literal_string) > 0:
 	literal_token += np.binary_repr(len(literal_string) - 1).zfill(literal_length_bits)
 	enc += literal_token
 	for j in literal_string:
-		enc += np.binary_repr(ord(j)).zfill(character_bits)
+		enc += D1_codewords[ord(j)]
+
+enc = D1_length_encoding + enc
 
 ofile = open('huffman_in.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)

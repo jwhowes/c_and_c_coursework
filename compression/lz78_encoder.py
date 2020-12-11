@@ -13,7 +13,7 @@ ifile.close()
 max_dict_count = 2**16 - 1
 dict_count = 0
 
-character_bits = 8
+character_bits = 7
 index_bits = math.ceil(math.log(max_dict_count + 1, 2))
 
 class Trie:
@@ -51,6 +51,9 @@ while i < len(m):
 		child_chr = m[-1]  # figure out exactly what causes this (this solution causes issues)
 	else:
 		child_chr = m[i + l - 1]
+	if child_chr > 127:
+		print("oh no!")
+		input()
 	c = np.binary_repr(child_chr).zfill(character_bits)
 	# Add a new child in the trie
 	node.add_child(child_chr)
@@ -60,6 +63,8 @@ while i < len(m):
 	# Add the token (p, c) to the output (where p is position in the dictionary of the longest match and c is the character immediately following this matched)
 	enc += p + c
 	i += l  # Continue encoding from the next unmatched character
+
+print(enc)
 
 # Write to output file
 ofile = open('compressed.lz', 'wb')

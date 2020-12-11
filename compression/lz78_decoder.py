@@ -11,12 +11,12 @@ ifile.close()
 dict_count = 1
 max_dict_count = 2**16 - 1
 
-character_bits = 8
+character_bits = 7
 index_bits = math.ceil(math.log(max_dict_count + 1, 2))
 
 enc = ""
 for i in b:
-	enc += np.binary_repr(i).zfill(character_bits)
+	enc += np.binary_repr(i).zfill(8)
 
 dictionary = [(0, 0)]
 

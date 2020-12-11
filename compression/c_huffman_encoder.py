@@ -4,7 +4,7 @@ import sys
 import json
 from bitstring import *
 
-ifile = open("huffman_in.lz", "rb")
+ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
