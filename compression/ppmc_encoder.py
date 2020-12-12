@@ -4,7 +4,7 @@ import sys
 import json
 from bitstring import *
 
-ifile = open("in.tex", "r")
+ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -13,13 +13,18 @@ N = 2
 C = ""
 i = 0
 
+enc = ""
+
+def arithmetic_coder(low_cum_freq, high_cum_freq):
+	return 0
+
 class Trie:
 	def __init__(self, character):
 		self.character = character
 		self.frequency = 1
 		self.children = []
-	def add_character(self, depth=0, con_string=""):
-		if con_string + self.character == C[len(C) - depth:]:
+	def add_character(self, depth=0, con_string=b""):
+		if self.character is None or con_string + chr(self.character).encode() == C[len(C) - depth:]:
 			found = False
 			for c in self.children:
 				if c.character == m[i]:
@@ -29,17 +34,25 @@ class Trie:
 			if not found:
 				self.children.append(Trie(m[i]))
 			for c in self.children:
-				c.add_character(depth + 1, con_string + self.character)
+				if self.character is None:
+					c.add_character(depth + 1, con_string)
+				else:
+					c.add_character(depth + 1, con_string + chr(self.character).encode())
 		elif depth < len(C):
 			for c in self.children:
 				if C[depth] == c.character:
-					c.add_character(depth + 1, con_string + self.character)
+					if self.character is None:
+						c.add_character(depth + 1, con_string)
+					else:
+						c.add_character(depth + 1, con_string + chr(self.character).encode())
 	def get_code(self, c_length, c_pos):
+		global enc
 		denominator = 0
 		node = None
 		low = 0
 		if c_length == -1:
-			print(m[i], "order -1")
+			# Encode character with context -1
+			enc += str(arithmetic_coder((m[i]) / 128, ((m[i]) + 1) / 128))
 			return
 		if c_pos == 0:
 			for c in self.children:
@@ -50,7 +63,8 @@ class Trie:
 				denominator += c.frequency
 			denominator += len(self.children)
 			if node is not None:
-				print(node.character, "low:", str(low) + "/" + str(denominator), "high:", str(low + node.frequency) + "/" + str(denominator))
+				# Encode character
+				enc += str(arithmetic_coder(low / denominator, (low + node.frequency) / denominator))
 				return
 		else:
 			for c in self.children:
@@ -59,14 +73,17 @@ class Trie:
 					return
 				denominator += c.frequency
 			denominator += len(self.children)
-		print("escape", "low:", str(denominator - len(self.children)) + "/" + str(denominator), "high:", 1)
+		# Encode escape character
+		if denominator == 0:
+			enc += str(arithmetic_coder(0, 1))
+		else:
+			enc += str(arithmetic_coder((denominator - len(self.children)) / denominator, 1))
 		root.get_code(c_length - 1, c_length - 1)
 # Currently it just prints what's encoded and with what probability but it is correct
-root = Trie("")
+root = Trie(None)
 
 while i < len(m):
 	C = m[max(0, i - N) : i]
 	root.get_code(len(C), len(C))
 	root.add_character()
-	print("!")
 	i += 1
