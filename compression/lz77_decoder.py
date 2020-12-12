@@ -1,9 +1,7 @@
 import numpy as np
 import math
 import sys
-import json
 from bitstring import *
-import binascii
 
 W = 2**8 - 1
 L = 2**8 - 1

@@ -1,7 +1,6 @@
 import numpy as np
 import math
 import sys
-import json
 from bitstring import *
 
 ifile = open("in.tex", "rb")
@@ -16,7 +15,7 @@ i = 0
 enc = ""
 
 def arithmetic_coder(low_cum_freq, high_cum_freq):
-	return 0
+	return "0"
 
 class Trie:
 	def __init__(self, character):
@@ -52,7 +51,7 @@ class Trie:
 		low = 0
 		if c_length == -1:
 			# Encode character with context -1
-			enc += str(arithmetic_coder((m[i]) / 128, ((m[i]) + 1) / 128))
+			enc += arithmetic_coder((m[i]) / 128, ((m[i]) + 1) / 128)
 			return
 		if c_pos == 0:
 			for c in self.children:
@@ -64,7 +63,7 @@ class Trie:
 			denominator += len(self.children)
 			if node is not None:
 				# Encode character
-				enc += str(arithmetic_coder(low / denominator, (low + node.frequency) / denominator))
+				enc += arithmetic_coder(low / denominator, (low + node.frequency) / denominator)
 				return
 		else:
 			for c in self.children:
@@ -75,9 +74,9 @@ class Trie:
 			denominator += len(self.children)
 		# Encode escape character
 		if denominator == 0:
-			enc += str(arithmetic_coder(0, 1))
+			enc += arithmetic_coder(0, 1)
 		else:
-			enc += str(arithmetic_coder((denominator - len(self.children)) / denominator, 1))
+			enc += arithmetic_coder((denominator - len(self.children)) / denominator, 1)
 		root.get_code(c_length - 1, c_length - 1)
 # Currently it just prints what's encoded and with what probability but it is correct
 root = Trie(None)
@@ -87,3 +86,7 @@ while i < len(m):
 	root.get_code(len(C), len(C))
 	root.add_character()
 	i += 1
+
+ofile = open('compressed.lz', 'wb')
+BitArray(bin=enc).tofile(ofile)
+ofile.close()
