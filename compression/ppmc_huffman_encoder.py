@@ -17,7 +17,7 @@ i = 0
 
 enc = ""
 
-neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
+neg_one_freqs = np.ones((alphabet_size), dtype=int)
 
 A = np.zeros(1, dtype=int)
 heap_length = 0
@@ -133,14 +133,13 @@ class Trie:
 		found = False
 		if c_length == -1:
 			# Encode character with context -1
-			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
+			freqs = [1 for i in range(alphabet_size) if i not in excluded]
 			p = 0
-			for c in range(alphabet_size + 1):
+			for c in range(alphabet_size):
 				if c not in excluded:
 					if c == m[i]:
 						break
 					p += 1
-			print(p, "order -1")
 			enc += huffman_encoder(p, neg_one_freqs.copy())
 			#enc += arithmetic_coder(m[i]/(alphabet_size + 1), (m[i] + 1) / (alphabet_size + 1))
 			return
@@ -156,7 +155,6 @@ class Trie:
 				freqs = [c.frequency for c in self.children if c.character is not excluded]
 				freqs.append(len(self.children))
 				# Encode character
-				print(p)
 				enc += huffman_encoder(p, freqs)
 				#enc += arithmetic_coder(low / denominator, (low + node.frequency) / denominator)
 				return
@@ -170,7 +168,6 @@ class Trie:
 		if len(self.children) != 0:
 			freqs = [c.frequency for c in self.children if c.character is not excluded]
 			freqs.append(len(self.children))
-			print("escape")
 			enc += huffman_encoder(len(freqs) - 1, freqs)
 			#enc += arithmetic_coder((denominator - len(self.children)) / denominator, 1)
 			for c in self.children:
