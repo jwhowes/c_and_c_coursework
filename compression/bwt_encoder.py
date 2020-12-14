@@ -4,7 +4,9 @@ import sys
 import time
 from bitstring import *
 
-m = b"peter piper picked a peck of pickled peppers"
+ifile = open("in.tex", "rb")
+m = ifile.read()
+ifile.close()
 
 start_symbol = b"\x80"
 end_symbol = b"\x81"
@@ -25,4 +27,6 @@ enc = bytearray()
 for i in table:
 	enc.append(i[-1])
 
-print(enc)
+ofile = open("bwt.lz", "w", newline='\n')
+ofile.write(str(enc, encoding="utf-8"))
+ofile.close()
