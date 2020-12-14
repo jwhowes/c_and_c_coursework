@@ -20,9 +20,10 @@ enc = ""
 precision = 32
 a = 0
 b = 2**precision - 1
+cntr = 0
 
 def arithmetic_coder(low_cum_freq, high_cum_freq):
-	global a, b
+	global a, b, cntr
 	old_a = a
 	ret = ""
 	w = b - a + 1
@@ -30,10 +31,24 @@ def arithmetic_coder(low_cum_freq, high_cum_freq):
 	b = old_a + math.floor(w * high_cum_freq) - 1
 	a_bin = np.binary_repr(a).zfill(precision)
 	b_bin = np.binary_repr(b).zfill(precision)
+	if a_bin[0] == b_bin[0]:
+		ret += a_bin[0]
+		if cntr > 0:
+			if a_bin[0] == "0":
+				ret += '0' * cntr
+			else:
+				ret += '1' * cntr
+			cntr = 0
+		a_bin = a_bin[1:] + "0"
+		b_bin = b_bin[1:] + "1"
 	while a_bin[0] == b_bin[0]:
 		ret += a_bin[0]
 		a_bin = a_bin[1:] + "0"
 		b_bin = b_bin[1:] + "1"
+	while a_bin[0] == "0" and a_bin[1] == "1" and b_bin[0] == "1" and b_bin[1] == "0":
+		a_bin = a_bin[0] + a_bin[2:] + "0"
+		b_bin = b_bin[0] + b_bin[2:] + "1"
+		cntr += 1
 	a = int(a_bin, 2)
 	b = int(b_bin, 2)
 	return ret

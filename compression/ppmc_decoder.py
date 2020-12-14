@@ -28,7 +28,7 @@ decode_pos = 0
 neg_one_freqs = [1 for _ in range(alphabet_size + 1)]
 
 def arithmetic_decoder(frequencies):
-	global a, b, decode_pos
+	global a, b, decode_pos, cntr
 	w = b - a + 1
 	old_a = a
 	frequencies = [0] + frequencies
@@ -48,6 +48,9 @@ def arithmetic_decoder(frequencies):
 		a_bin = a_bin[1:] + "0"
 		b_bin = b_bin[1:] + "1"
 		decode_pos += 1
+	'''while a_bin[0] == "0" and a_bin[1] == "1" and b_bin[0] == "1" and b_bin[1] == "0":
+		a_bin = a_bin[0] + a_bin[2:] + "0"
+		b_bin = b_bin[0] + b_bin[2:] + "1"'''
 	a = int(a_bin, 2)
 	b = int(b_bin, 2)
 	return char
@@ -111,11 +114,11 @@ while True:
 	C = [i for i in dec[max(0, i - N) : i]]
 	if not root.get_character(len(C), len(C)):
 		break
+	print(dec)
+	input()
 	root.add_character()
 	i += 1
 
 ofile = open("out.tex", "w", newline="\n")
 ofile.write(str(dec, encoding='utf-8'))
 ofile.close()
-
-# It works up to a point. I think underflow is probably happening
