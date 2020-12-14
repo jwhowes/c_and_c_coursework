@@ -99,6 +99,8 @@ def huffman_encoder(character, frequencies):
 		num += 1
 	return codewords[character]
 
+excluded = {}
+
 class Trie:
 	def __init__(self, character):
 		self.character = character
@@ -127,23 +129,35 @@ class Trie:
 					else:
 						c.add_character(depth + 1, con_string + [self.character])
 	def get_code(self, c_length, c_pos):
-		global enc
-		pos = -1
+		global enc, excluded
+		found = False
 		if c_length == -1:
-			# Encode character with context -1z
-			enc += huffman_encoder(m[i], neg_one_freqs.copy())
+			# Encode character with context -1
+			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
+			p = 0
+			for c in range(alphabet_size + 1):
+				if c not in excluded:
+					if c == m[i]:
+						break
+					p += 1
+			print(p, "order -1")
+			enc += huffman_encoder(p, neg_one_freqs.copy())
 			#enc += arithmetic_coder(m[i]/(alphabet_size + 1), (m[i] + 1) / (alphabet_size + 1))
 			return
 		if c_pos == 0:
-			for c in range(len(self.children)):
-				if self.children[c].character == m[i]:
-					pos = c
-					break
-			if pos != -1:
-				freqs = [c.frequency for c in self.children]
+			p = 0
+			for c in self.children:
+				if c.character not in excluded:
+					if c.character == m[i]:
+						found = True
+						break
+					p += 1
+			if found:
+				freqs = [c.frequency for c in self.children if c.character is not excluded]
 				freqs.append(len(self.children))
 				# Encode character
-				enc += huffman_encoder(pos, freqs)
+				print(p)
+				enc += huffman_encoder(p, freqs)
 				#enc += arithmetic_coder(low / denominator, (low + node.frequency) / denominator)
 				return
 		else:
@@ -154,24 +168,25 @@ class Trie:
 		# Encode escape character
 		# if there are no children (context has never been seen before), we print nothing
 		if len(self.children) != 0:
-			freqs = [c.frequency for c in self.children]
+			freqs = [c.frequency for c in self.children if c.character is not excluded]
 			freqs.append(len(self.children))
-			enc += huffman_encoder(len(self.children), freqs)
+			print("escape")
+			enc += huffman_encoder(len(freqs) - 1, freqs)
 			#enc += arithmetic_coder((denominator - len(self.children)) / denominator, 1)
+			for c in self.children:
+				excluded[c.character] = True
 		root.get_code(c_length - 1, c_length - 1)
 # Currently it just prints what's encoded and with what probability but it is correct
 root = Trie(None)
 
-m += (alphabet_size).to_bytes(1, 'little')
-
 start = time.time()
 while i < len(m):
 	C = [i for i in m[max(0, i - N) : i]]
+	excluded = {}
 	root.get_code(len(C), len(C))
 	root.add_character()
 	i += 1
 
-print(len(enc)/8, len(m))
 print("took", time.time() - start, "seconds")
 
 ofile = open('compressed.lz', 'wb')
