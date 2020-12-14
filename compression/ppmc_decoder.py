@@ -1,7 +1,6 @@
 import numpy as np
 import math
 import sys
-import ctypes
 from bitstring import *
 
 ifile = open("compressed.lz", "rb")
@@ -14,10 +13,7 @@ enc = ""
 for i in b:
 	enc += np.binary_repr(i).zfill(8)
 
-for i in range(5):
-	enc = enc[:len(enc) - 1]
-
-dec = b""
+dec = bytearray()
 
 N = 2
 
@@ -29,7 +25,7 @@ a = 0
 b = 2**precision - 1
 decode_pos = 0
 
-neg_one_freqs = [1 for _ in range(alphabet_size)]
+neg_one_freqs = [1 for _ in range(alphabet_size + 1)]
 
 def arithmetic_decoder(frequencies):
 	global a, b, decode_pos
@@ -45,7 +41,7 @@ def arithmetic_decoder(frequencies):
 			char = i - 1
 			break
 	a = old_a + math.floor(w*frequencies[char]/frequencies[-1])
-	b = old_a + math.floor(w*frequencies[char + 1]/frequencies[-1])
+	b = old_a + math.floor(w*frequencies[char + 1]/frequencies[-1]) - 1
 	a_bin = np.binary_repr(a).zfill(precision)
 	b_bin = np.binary_repr(b).zfill(precision)
 	while a_bin[0] == b_bin[0]:
@@ -61,8 +57,8 @@ class Trie:
 		self.character = character
 		self.frequency = 1
 		self.children = []
-	def add_character(self, depth=0, con_string=b""):
-		if self.character is None or con_string + chr(self.character).encode() == C[len(C) - depth:]:
+	def add_character(self, depth=0, con_string=[]):
+		if self.character is None or con_string + [self.character] == C[len(C) - depth:]:
 			found = False
 			for c in self.children:
 				if c.character == dec[i]:
@@ -75,14 +71,14 @@ class Trie:
 				if self.character is None:
 					c.add_character(depth + 1, con_string)
 				else:
-					c.add_character(depth + 1, con_string + chr(self.character).encode())
+					c.add_character(depth + 1, con_string + [self.character])
 		elif depth < len(C):
 			for c in self.children:
 				if C[depth] == c.character:
 					if self.character is None:
 						c.add_character(depth + 1, con_string)
 					else:
-						c.add_character(depth + 1, con_string + chr(self.character).encode())
+						c.add_character(depth + 1, con_string + [self.character])
 	def get_character(self, c_length, c_pos):
 		global dec
 		denominator = 0
@@ -90,33 +86,36 @@ class Trie:
 		low = 0
 		if c_length == -1:
 			x = arithmetic_decoder(neg_one_freqs.copy())
-			dec += chr(x).encode()
-			return
+			if x == alphabet_size:
+				return False
+			dec.append(x)
+			return True
 		if c_pos == 0:
 			if len(self.children) == 0:
-				root.get_character(c_length - 1, c_length - 1)
-				return
+				return root.get_character(c_length - 1, c_length - 1)
 			freqs = [c.frequency for c in self.children]
 			freqs.append(len(self.children))
 			p = arithmetic_decoder(freqs)
 			if p == len(self.children):
-				root.get_character(c_length - 1, c_length - 1)
-				return
-			dec += chr(self.children[p].character).encode()
+				return root.get_character(c_length - 1, c_length - 1)
+			dec.append(self.children[p].character)
 		else:
 			for c in self.children:
 				if c.character == C[-c_pos]:
-					c.get_character(c_length, c_pos - 1)
-					return
+					return c.get_character(c_length, c_pos - 1)
+		return True
 
 root = Trie(None)
 
 while True:
-	C = dec[max(0, i - N) : i]
-	root.get_character(len(C), len(C))
-	print(dec)
-	input()
+	C = [i for i in dec[max(0, i - N) : i]]
+	if not root.get_character(len(C), len(C)):
+		break
 	root.add_character()
 	i += 1
+
+ofile = open("out.tex", "w", newline="\n")
+ofile.write(str(dec, encoding='utf-8'))
+ofile.close()
 
 # It works up to a point. I think underflow is probably happening

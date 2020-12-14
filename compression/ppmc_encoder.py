@@ -1,12 +1,14 @@
 import numpy as np
 import math
 import sys
-import ctypes
+import time
 from bitstring import *
 
 ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
+
+alphabet_size = 128
 
 N = 2
 
@@ -37,41 +39,13 @@ def arithmetic_coder(low_cum_freq, high_cum_freq):
 	return ret
 	# Need to add rescaling
 
-decode_a = 0
-decode_b = 2**precision - 1
-decode_pos = 0
-def arithmetic_decoder(enc, frequencies):
-	global decode_a, decode_b, decode_pos
-	w = decode_b - decode_a + 1
-	old_a = decode_a
-	frequencies = [0] + frequencies
-	for i in range(1, len(frequencies)):
-		frequencies[i] += frequencies[i - 1]
-	index = math.floor(((int(enc[decode_pos : decode_pos + precision], 2) - decode_a + 1) * frequencies[-1] - 1) / (decode_b - decode_a + 1))
-	char = 0
-	for i in range(len(frequencies)):
-		if frequencies[i] > index:
-			char = i - 1
-			break
-	decode_a = old_a + math.floor(w*frequencies[char]/frequencies[-1])
-	decode_b = old_a + math.floor(w*frequencies[char + 1]/frequencies[-1])
-	a_bin = np.binary_repr(decode_a).zfill(precision)
-	b_bin = np.binary_repr(decode_b).zfill(precision)
-	while a_bin[0] == b_bin[0]:
-		a_bin = a_bin[1:] + "0"
-		b_bin = b_bin[1:] + "1"
-		decode_pos += 1
-	decode_a = int(a_bin, 2)
-	decode_b = int(b_bin, 2)
-	return char
-
 class Trie:
 	def __init__(self, character):
 		self.character = character
 		self.frequency = 1
 		self.children = []
-	def add_character(self, depth=0, con_string=b""):
-		if self.character is None or con_string + chr(self.character).encode() == C[len(C) - depth:]:
+	def add_character(self, depth=0, con_string=[]):
+		if self.character is None or con_string + [self.character] == C[len(C) - depth:]:
 			found = False
 			for c in self.children:
 				if c.character == m[i]:
@@ -84,22 +58,22 @@ class Trie:
 				if self.character is None:
 					c.add_character(depth + 1, con_string)
 				else:
-					c.add_character(depth + 1, con_string + chr(self.character).encode())
+					c.add_character(depth + 1, con_string + [self.character])
 		elif depth < len(C):
 			for c in self.children:
 				if C[depth] == c.character:
 					if self.character is None:
 						c.add_character(depth + 1, con_string)
 					else:
-						c.add_character(depth + 1, con_string + chr(self.character).encode())
+						c.add_character(depth + 1, con_string + [self.character])
 	def get_code(self, c_length, c_pos):
 		global enc
 		denominator = 0
 		node = None
 		low = 0
 		if c_length == -1:
-			# Encode character with context -1
-			enc += arithmetic_coder(m[i]/128, (m[i] + 1) / 128)
+			# Encode character with context -1z
+			enc += arithmetic_coder(m[i]/(alphabet_size + 1), (m[i] + 1) / (alphabet_size + 1))
 			return
 		if c_pos == 0:
 			for c in self.children:
@@ -128,12 +102,17 @@ class Trie:
 # Currently it just prints what's encoded and with what probability but it is correct
 root = Trie(None)
 
+m += (alphabet_size).to_bytes(1, 'little')
+
+start = time.time()
 while i < len(m):
-	C = m[max(0, i - N) : i]
+	C = [i for i in m[max(0, i - N) : i]]
 	root.get_code(len(C), len(C))
 	root.add_character()
 	i += 1
 enc += np.binary_repr(b)
+
+print("took", time.time() - start, "seconds")
 
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
