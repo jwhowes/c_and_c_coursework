@@ -8,24 +8,30 @@ ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
-start_symbol = b"\x80"
-end_symbol = b"\x81"
+end_symbol = 0
 
-m = start_symbol + m + end_symbol
+enc = bytearray(m)
+enc.append(end_symbol)
 
-def rotate(s):
-	return s[-1].to_bytes(1, 'little') + s[:-1]
-
-table = [b"" for i in range(len(m))]
-table[0] = m
-for i in range(1, len(m)):
-	table[i] = rotate(table[i - 1])
-
-table.sort()
-
-enc = bytearray()
-for i in table:
-	enc.append(i[-1])
+for s in range(len(enc) - 3, -1, -1):
+	c = enc[s]
+	r = s
+	i = s + 1
+	while enc[i] != end_symbol:
+		if enc[i] <= c:
+			r += 1
+		i += 1
+	p = i
+	while i < len(enc):
+		if enc[i] < c:
+			r += 1
+		i += 1
+	enc[p] = c
+	i = s
+	while i < r:
+		enc[i] = enc[i + 1]
+		i += 1
+	enc[r] = end_symbol
 
 ofile = open("bwt.lz", "w", newline='\n')
 ofile.write(str(enc, encoding="utf-8"))

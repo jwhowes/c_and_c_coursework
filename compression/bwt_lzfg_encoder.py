@@ -8,24 +8,9 @@ ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
-start_symbol = b"\x80"
-end_symbol = b"\x81"
+start = time.time()
 
-m = start_symbol + m + end_symbol
-
-def rotate(s):
-	return s[-1].to_bytes(1, 'little') + s[:-1]
-
-table = [b"" for i in range(len(m))]
-table[0] = m
-for i in range(1, len(m)):
-	table[i] = rotate(table[i - 1])
-
-table.sort()
-
-m = bytearray()
-for i in table:
-	m.append(i[-1])
+m = bytearray(m)
 
 literal_bits = 8
 max_literal_length = 16
@@ -38,6 +23,40 @@ copy_depth_bits = int(copy_bits - math.log(max_literal_length, 2))
 copy_length_bits = copy_bits - copy_depth_bits
 
 character_bits = 8
+
+end_symbol = 0
+bwt_chunk_size = 2*search_buffer_size
+
+bwt = bytearray()
+
+for k in range(0, len(m), bwt_chunk_size):
+	chunk = m[k : k + bwt_chunk_size]
+	chunk.append(end_symbol)
+	n = len(chunk)
+	for s in range(n - 3, -1, -1):
+		c = chunk[s]
+		r = s
+		i = s + 1
+		while chunk[i] != end_symbol:
+			if chunk[i] <= c:
+				r += 1
+			i += 1
+		p = i
+		while i < n:
+			if chunk[i] < c:
+				r += 1
+			i += 1
+		chunk[p] = c
+		i = s
+		while i < r:
+			chunk[i] = chunk[i + 1]
+			i += 1
+		chunk[r] = end_symbol
+	bwt += chunk
+
+m = bwt
+
+print("took", time.time() - start, "seconds to compute bwt")
 
 literal_string = ""
 
@@ -77,6 +96,8 @@ if len(literal_string) > 0:
 	enc += literal_token
 	for j in literal_string:
 		enc += np.binary_repr(ord(j)).zfill(character_bits)
+
+print("took", time.time() - start, "seconds")
 
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)

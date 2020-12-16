@@ -2,25 +2,49 @@ import numpy as np
 import math
 import sys
 import time
+import heapq
 from bitstring import *
 
-enc = b'dkadrfr eiieepklpptppopppccck   ip\x80   eeeere\x81s'
+ifile = open("bwt.lz", "rb")
+enc = ifile.read()
+ifile.close()
 
-start_symbol = b"\x80"
-end_symbol = b"\x81"  # It's important that end_symbol > any other
+end_symbol = 0
 
-table = [[None for j in range(len(enc))] for i in range(len(enc))]
+dec = bytearray(enc)
 
-for i in range(len(enc)):
-	for j in range(len(enc)):
-		table[j][-(i + 1)] = enc[j]
-	table.sort()
+n = len(dec)
 
-dec = []
-for i in table:
-	if i[-1].to_bytes(1, 'little') == end_symbol:
-		dec = i
+p = 0
+while dec[p] != end_symbol:
+	p += 1
+p += 1
 
-dec = bytearray(dec)
-dec = dec[1:-1]
-print(dec)
+dec_pos = 0
+while n - dec_pos > 2:
+	c = heapq.nsmallest(p, dec[dec_pos:])[-1]
+	count = 0
+	for i in range(n - dec_pos):
+		if dec[i + dec_pos] < c:
+			count += 1
+	f = p - count
+	q = -1
+	while f > 0:
+		q += 1
+		if dec[q + dec_pos] == c:
+			f -= 1
+	dec[q + dec_pos] = end_symbol
+	for i in range(p-1, -1, -1):
+		dec[i + dec_pos] = dec[i + dec_pos - 1]
+	dec[dec_pos] = c
+	dec_pos += 1
+	if p - 1 > q:
+		p = q + 1
+	else:
+		p = q
+
+dec = dec[:-1]
+
+ofile = open("out.tex", "w", newline="\n")
+ofile.write(str(dec, encoding="utf-8"))
+ofile.close()

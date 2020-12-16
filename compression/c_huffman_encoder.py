@@ -3,7 +3,7 @@ import math
 import sys
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -108,6 +108,6 @@ enc = length_encoding + enc
 
 enc = np.binary_repr(length_bits).zfill(character_bits) + enc
 
-ofile = open('compressed.lz', 'wb')
+ofile = open('huffman_out.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()
