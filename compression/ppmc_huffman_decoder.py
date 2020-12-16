@@ -21,7 +21,7 @@ C = ""
 decode_pos = 0
 i = 0
 
-neg_one_freqs = np.ones((alphabet_size), dtype=int)
+neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
 
 A = np.zeros(1, dtype=int)
 heap_length = 0
@@ -103,7 +103,7 @@ def huffman_decoder(frequencies):
 		num += 1
 	codewords = dict([(v, k) for k, v in codewords.items()])
 	v = ""
-	while decode_pos < len(enc):
+	while decode_pos <= len(enc):
 		if v in codewords:
 			return codewords[v]
 		v += enc[decode_pos]
@@ -141,9 +141,10 @@ class Trie:
 	def get_character(self, c_length, c_pos):
 		global dec, excluded
 		if c_length == -1:
-			x = huffman_decoder(neg_one_freqs.copy())
+			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
+			x = huffman_decoder(freqs)
 			pos = 0
-			for c in range(alphabet_size):
+			for c in range(alphabet_size + 1):
 				if c not in excluded:
 					if pos == x:
 						x = c
@@ -156,10 +157,12 @@ class Trie:
 		if c_pos == 0:
 			if len(self.children) == 0:
 				return root.get_character(c_length - 1, c_length - 1)
-			freqs = [c.frequency for c in self.children]
+			freqs = [c.frequency for c in self.children if c.character not in excluded]
+			if len(freqs) == 0:
+				return root.get_character(c_length - 1, c_length - 1)
 			freqs.append(len(self.children))
 			p = huffman_decoder(freqs)
-			if p == len(self.children):
+			if p == len(freqs) - 1:
 				for c in self.children:
 					excluded[c.character] = True
 				return root.get_character(c_length - 1, c_length - 1)
@@ -184,8 +187,6 @@ while decode_pos < len(enc):
 	excluded = {}
 	if not root.get_character(len(C), len(C)):
 		break
-	print(dec)
-	input()
 	root.add_character()
 	i += 1
 
