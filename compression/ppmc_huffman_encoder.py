@@ -106,8 +106,11 @@ class Trie:
 		self.character = character
 		self.frequency = 1
 		self.children = []
-	def add_character(self, depth=0, con_string=[]):
-		if self.character is None or con_string + [self.character] == C[len(C) - depth:]:
+	def add_character(self):
+		for i in range(len(C) + 1):
+			self.add_child(i, 0)
+	def add_child(self, con_length, depth):
+		if depth == con_length:
 			found = False
 			for c in self.children:
 				if c.character == m[i]:
@@ -116,18 +119,11 @@ class Trie:
 					break
 			if not found:
 				self.children.append(Trie(m[i]))
+		else:
 			for c in self.children:
-				if self.character is None:
-					c.add_character(depth + 1, con_string)
-				else:
-					c.add_character(depth + 1, con_string + [self.character])
-		elif depth < len(C):
-			for c in self.children:
-				if C[depth] == c.character:
-					if self.character is None:
-						c.add_character(depth + 1, con_string)
-					else:
-						c.add_character(depth + 1, con_string + [self.character])
+				if C[depth - con_length] == c.character:
+					c.add_child(con_length, depth + 1)
+					break
 	def get_code(self, c_length, c_pos):
 		global enc, excluded
 		found = False
@@ -141,7 +137,6 @@ class Trie:
 						break
 					p += 1
 			enc += huffman_encoder(p, freqs)
-			#enc += arithmetic_coder(m[i]/(alphabet_size + 1), (m[i] + 1) / (alphabet_size + 1))
 			return
 		if c_pos == 0:
 			p = 0
@@ -156,7 +151,6 @@ class Trie:
 				freqs.append(len(self.children))
 				# Encode character
 				enc += huffman_encoder(p, freqs)
-				#enc += arithmetic_coder(low / denominator, (low + node.frequency) / denominator)
 				return
 		else:
 			for c in self.children:
@@ -172,11 +166,10 @@ class Trie:
 				return
 			freqs.append(len(self.children))
 			enc += huffman_encoder(len(freqs) - 1, freqs)
-			#enc += arithmetic_coder((denominator - len(self.children)) / denominator, 1)
 			for c in self.children:
 				excluded[c.character] = True
 		root.get_code(c_length - 1, c_length - 1)
-# Currently it just prints what's encoded and with what probability but it is correct
+
 root = Trie(None)
 
 m += (alphabet_size).to_bytes(1, 'little')

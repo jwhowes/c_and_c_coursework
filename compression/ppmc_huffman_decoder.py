@@ -116,8 +116,11 @@ class Trie:
 		self.character = character
 		self.frequency = 1
 		self.children = []
-	def add_character(self, depth=0, con_string=[]):
-		if self.character is None or con_string + [self.character] == C[len(C) - depth:]:
+	def add_character(self):
+		for i in range(len(C) + 1):
+			self.add_child(i, 0)
+	def add_child(self, con_length, depth):
+		if depth == con_length:
 			found = False
 			for c in self.children:
 				if c.character == dec[i]:
@@ -126,18 +129,11 @@ class Trie:
 					break
 			if not found:
 				self.children.append(Trie(dec[i]))
+		else:
 			for c in self.children:
-				if self.character is None:
-					c.add_character(depth + 1, con_string)
-				else:
-					c.add_character(depth + 1, con_string + [self.character])
-		elif depth < len(C):
-			for c in self.children:
-				if C[depth] == c.character:
-					if self.character is None:
-						c.add_character(depth + 1, con_string)
-					else:
-						c.add_character(depth + 1, con_string + [self.character])
+				if C[depth - con_length] == c.character:
+					c.add_child(con_length, depth + 1)
+					break
 	def get_character(self, c_length, c_pos):
 		global dec, excluded
 		if c_length == -1:
