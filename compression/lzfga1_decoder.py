@@ -12,7 +12,7 @@ copy_bits = 16
 copy_depth_bits = int(copy_bits - math.log(max_literal_length, 2))
 copy_length_bits = copy_bits - copy_depth_bits
 
-character_bits = 7
+character_bits = 8
 
 ifile = open("compressed.lz", "rb")
 b = ifile.read()

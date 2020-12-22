@@ -1,0 +1,5 @@
+.*
+*.tex
+*.lz
+*.exe
+!.gitignore

@@ -21,28 +21,46 @@ ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
+class Trie:
+	def __init__(self, character):
+		self.character = character
+		self.children = []
+	def add_string(self, string, pos=0):
+		if pos >= len(string):
+			return
+		for child in self.children:
+			if child.character == string[pos]:
+				child.add_string(string, pos + 1)
+				return
+		self.children.append(Trie(string[pos]))
+		self.children[-1].add_string(string, pos + 1)
+	def find_match(self, i, string=b""):
+		best_s = string
+		if i < len(m):
+			for child in self.children:
+				if child.character == m[i]:
+					s = child.find_match(i + 1, string + (child.character).to_bytes(1, 'little'))
+					if len(s) > len(best_s) and s in latex_dict:
+						best_s = s
+		return best_s
+
 enc = bytearray()
+
+root = Trie(None)
+
+for i in latex_dict:
+	root.add_string(i)
 
 i = 0
 while i < len(m):
-	if m[i] == 92:
-		longest_match = None
-		for k in latex_dict:
-			if i + len(k) <= len(m) and m[i : i + len(k)] == k and (longest_match is None or len(k) > len(longest_match)):
-				longest_match = k
-		if longest_match is None:
-			enc.append(m[i])
-			i += 1
-		else:
-			enc += latex_dict[longest_match]
-			i += len(longest_match)
-	else:
+	s = root.find_match(i)
+	if s == b"":
 		enc.append(m[i])
 		i += 1
+	else:
+		enc += latex_dict[s]
+		i += len(s)
 
-print(len(m), len(enc))
-print(m, enc)
-
-ofile = open("dict_encoder_out.lz", "wb")
+ofile = open("dict_encoded.lz", "wb")
 ofile.write(enc)
 ofile.close()
