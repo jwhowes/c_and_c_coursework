@@ -3,8 +3,11 @@ ppmc_huffman (encoding sherlock_shorter (originally 754 KB))
 	N = 4: 9.39 mins,	227 KB	(checked)
 	N = 5: 8.56 mins,	224 KB	(checked)
 	N = 6: 9.83 mins,	225 KB	(checked)
-	N = 7: 9.39 mins,	226 KB	(unchecked)
+	N = 7: 9.39 mins,	226 KB	(checked)
 	N = 8: 10.65 mins,	228 KB	(checked)
 
 dict_ppmc_huffman (dict encoding followed by ppmc_huffman) (encoding sherlock_shorter) (times are for ppmc_huffman):
 	N = 5: 12.18 mins	213 KB	(checked)
+
+dict_lzfg_ppmc_huffman:
+	N = 5: 41 mins,		328 KB	(unchecked)
