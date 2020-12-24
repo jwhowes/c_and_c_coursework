@@ -4,20 +4,21 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
-alphabet_size = 128
+alphabet_size = 256
+eof_string = b"\x80\x80"
 
-N = 2
+N = 5
 
 C = ""
 i = 0
 
 enc = ""
 
-neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
+#neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
 
 A = np.zeros(1, dtype=int)
 heap_length = 0
@@ -172,7 +173,7 @@ class Trie:
 
 root = Trie(None)
 
-m += (alphabet_size).to_bytes(1, 'little')
+m += eof_string
 
 start = time.time()
 while i < len(m):

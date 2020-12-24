@@ -12,7 +12,7 @@ for i in range(len(latex_commands)):
 	latex_commands[i] = latex_commands[i].replace("\r", "")
 	latex_commands[i] = latex_commands[i].encode()
 
-ifile = open("dict_encoded.lz", "rb")
+ifile = open("ppmc_out.lz", "rb")
 enc = ifile.read()
 ifile.close()
 
@@ -28,6 +28,6 @@ while i < len(enc):
 		i += 1
 	i += 1
 
-ofile = open("dict_decoded.tex", "w")
+ofile = open("out.tex", "w", newline="\n")
 ofile.write(str(dec, encoding='utf-8'))
 ofile.close()

@@ -1,13 +1,15 @@
 import numpy as np
 import math
 import sys
+import time
 from bitstring import *
 
 ifile = open("compressed.lz", "rb")
 b = ifile.read()
 ifile.close()
 
-alphabet_size = 128
+alphabet_size = 256
+eof_string = b"\x80\x80"
 
 enc = ""
 for i in b:
@@ -15,7 +17,7 @@ for i in b:
 
 dec = bytearray()
 
-N = 2
+N = 5
 
 C = ""
 decode_pos = 0
@@ -108,6 +110,7 @@ def huffman_decoder(frequencies):
 			return codewords[v]
 		v += enc[decode_pos]
 		decode_pos += 1
+	return None
 
 excluded = {}
 
@@ -139,6 +142,8 @@ class Trie:
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
 			x = huffman_decoder(freqs)
+			if x is None:
+				return False
 			pos = 0
 			for c in range(alphabet_size + 1):
 				if c not in excluded:
@@ -146,8 +151,6 @@ class Trie:
 						x = c
 						break
 					pos += 1
-			if x == alphabet_size:
-				return False
 			dec.append(x)
 			return True
 		if c_pos == 0:
@@ -158,6 +161,8 @@ class Trie:
 				return root.get_character(c_length - 1, c_length - 1)
 			freqs.append(len(self.children))
 			p = huffman_decoder(freqs)
+			if p is None:
+				return False
 			if p == len(freqs) - 1:
 				for c in self.children:
 					excluded[c.character] = True
@@ -178,14 +183,21 @@ class Trie:
 
 root = Trie(None)
 
+start = time.time()
+
 while decode_pos < len(enc):
 	C = [i for i in dec[max(0, i - N) : i]]
 	excluded = {}
 	if not root.get_character(len(C), len(C)):
 		break
+	if dec[-len(eof_string):] == eof_string:
+		dec = dec[:-len(eof_string)]
+		break
 	root.add_character()
 	i += 1
 
-ofile = open("out.tex", "w", newline="\n")
-ofile.write(str(dec, encoding='utf-8'))
+print("took", time.time() - start, "seconds")
+
+ofile = open("ppmc_out.lz", "wb")
+ofile.write(dec)
 ofile.close()

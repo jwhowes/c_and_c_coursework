@@ -35,9 +35,9 @@ def arithmetic_coder(low_cum_freq, high_cum_freq):
 		ret += a_bin[0]
 		if cntr > 0:
 			if a_bin[0] == "0":
-				ret += '0' * cntr
-			else:
 				ret += '1' * cntr
+			else:
+				ret += '0' * cntr
 			cntr = 0
 		a_bin = a_bin[1:] + "0"
 		b_bin = b_bin[1:] + "1"

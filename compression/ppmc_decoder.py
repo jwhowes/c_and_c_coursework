@@ -48,9 +48,6 @@ def arithmetic_decoder(frequencies):
 		a_bin = a_bin[1:] + "0"
 		b_bin = b_bin[1:] + "1"
 		decode_pos += 1
-	'''while a_bin[0] == "0" and a_bin[1] == "1" and b_bin[0] == "1" and b_bin[1] == "0":
-		a_bin = a_bin[0] + a_bin[2:] + "0"
-		b_bin = b_bin[0] + b_bin[2:] + "1"'''
 	a = int(a_bin, 2)
 	b = int(b_bin, 2)
 	return char

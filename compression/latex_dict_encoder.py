@@ -61,6 +61,6 @@ while i < len(m):
 		enc += latex_dict[s]
 		i += len(s)
 
-ofile = open("dict_encoded.lz", "wb")
+ofile = open("dict_compressed.lz", "wb")
 ofile.write(enc)
 ofile.close()
