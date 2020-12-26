@@ -45,6 +45,9 @@ while n - dec_pos > 2:
 
 dec = dec[:-1]
 
-ofile = open("out.tex", "w", newline="\n")
+for i in range(len(dec)):
+	dec[i] -= 1
+
+ofile = open("bwt_out.tex", "w", newline="\n")
 ofile.write(str(dec, encoding="utf-8"))
 ofile.close()

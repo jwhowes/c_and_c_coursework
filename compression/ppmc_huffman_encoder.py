@@ -4,21 +4,17 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("lzfg_encoded.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-eof_string = b"\x80\x80"
-
 N = 5
 
 C = ""
 i = 0
 
 enc = ""
-
-#neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
 
 A = np.zeros(1, dtype=int)
 heap_length = 0
@@ -130,9 +126,9 @@ class Trie:
 		found = False
 		if c_length == -1:
 			# Encode character with context -1
-			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
+			freqs = [1 for i in range(alphabet_size) if i not in excluded]
 			p = 0
-			for c in range(alphabet_size + 1):
+			for c in range(alphabet_size):
 				if c not in excluded:
 					if c == m[i]:
 						break
@@ -170,10 +166,26 @@ class Trie:
 			for c in self.children:
 				excluded[c.character] = True
 		root.get_code(c_length - 1, c_length - 1)
+	def end_message(self, c_length, c_pos):
+		global enc, excluded
+		if c_length == -1:
+			freqs = [1 for i in range(alphabet_size) if i not in excluded]
+			enc += huffman_encoder(len(freqs) - 1, freqs)
+			return
+		if len(self.children) != 0:
+			freqs = [c.frequency for c in self.children if c.character not in excluded]
+			if len(freqs) == 0:
+				root.end_message(c_length - 1, c_length - 1)
+				return
+			freqs.append(len(self.children))
+			enc += huffman_encoder(len(freqs) - 1, freqs)
+			for c in self.children:
+				excluded[c.character] = True
+		root.end_message(c_length - 1, c_length - 1)
+
+
 
 root = Trie(None)
-
-m += eof_string
 
 start = time.time()
 while i < len(m):
@@ -182,6 +194,11 @@ while i < len(m):
 	root.get_code(len(C), len(C))
 	root.add_character()
 	i += 1
+
+# End message by escaping N + 1 times (escapes out of order -1)
+C = [i for i in m[max(0, i - N) : i]]
+excluded = {}
+root.end_message(len(C), len(C))
 
 print("took", time.time() - start, "seconds")
 

@@ -9,7 +9,6 @@ b = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-eof_string = b"\x80\x80"
 
 enc = ""
 for i in b:
@@ -22,8 +21,6 @@ N = 5
 C = ""
 decode_pos = 0
 i = 0
-
-neg_one_freqs = np.ones((alphabet_size + 1), dtype=int)
 
 A = np.zeros(1, dtype=int)
 heap_length = 0
@@ -105,7 +102,7 @@ def huffman_decoder(frequencies):
 		num += 1
 	codewords = dict([(v, k) for k, v in codewords.items()])
 	v = ""
-	while decode_pos <= len(enc):
+	while decode_pos < len(enc):
 		if v in codewords:
 			return codewords[v]
 		v += enc[decode_pos]
@@ -140,12 +137,12 @@ class Trie:
 	def get_character(self, c_length, c_pos):
 		global dec, excluded
 		if c_length == -1:
-			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
+			freqs = [1 for i in range(alphabet_size) if i not in excluded]
 			x = huffman_decoder(freqs)
-			if x is None:
+			if x is None or x == len(freqs) - 1:
 				return False
 			pos = 0
-			for c in range(alphabet_size + 1):
+			for c in range(alphabet_size):
 				if c not in excluded:
 					if pos == x:
 						x = c
@@ -189,9 +186,6 @@ while decode_pos < len(enc):
 	C = [i for i in dec[max(0, i - N) : i]]
 	excluded = {}
 	if not root.get_character(len(C), len(C)):
-		break
-	if dec[-len(eof_string):] == eof_string:
-		dec = dec[:-len(eof_string)]
 		break
 	root.add_character()
 	i += 1

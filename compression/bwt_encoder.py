@@ -11,6 +11,9 @@ ifile.close()
 end_symbol = 0
 
 enc = bytearray(m)
+for i in range(len(enc)):
+	enc[i] += 1
+
 enc.append(end_symbol)
 
 for s in range(len(enc) - 3, -1, -1):

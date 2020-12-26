@@ -14,8 +14,14 @@ for i in range(len(latex_commands)):
 
 latex_dict = {}
 
+first_byte = 129
+second_byte = 0
 for i in range(len(latex_commands)):
-	latex_dict[latex_commands[i]] = (i + 33024).to_bytes(2, 'big')
+	latex_dict[latex_commands[i]] = (first_byte * 256 + second_byte).to_bytes(2, 'big')
+	second_byte += 1
+	if second_byte == 255:
+		second_byte = 0
+		first_byte += 1
 
 ifile = open("in.tex", "rb")
 m = ifile.read()
@@ -55,6 +61,8 @@ i = 0
 while i < len(m):
 	s = root.find_match(i)
 	if s == b"":
+		if m[i] >= 128:
+			enc.append(128)
 		enc.append(m[i])
 		i += 1
 	else:

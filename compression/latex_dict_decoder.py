@@ -18,16 +18,29 @@ ifile.close()
 
 dec = bytearray()
 
+inv_dict = {}
+first_byte = 129
+second_byte = 0
+for i in range(len(latex_commands)):
+	inv_dict[first_byte * 256 + second_byte] = latex_commands[i]
+	second_byte += 1
+	if second_byte == 255:
+		second_byte = 0
+		first_byte += 1
+
 i = 0
 while i < len(enc):
-	if enc[i] < 128:
+	if enc[i] == 128:
+		dec.append(enc[i + 1])
+		i += 1
+	elif enc[i] < 128:
 		dec.append(enc[i])
 	else:
-		index = enc[i]*256 + enc[i + 1] - 33024
-		dec += latex_commands[index]
+		index = enc[i]*256 + enc[i + 1]
+		dec += inv_dict[index]
 		i += 1
 	i += 1
 
-ofile = open("out.tex", "w", newline="\n")
-ofile.write(str(dec, encoding='utf-8'))
+ofile = open("out.tex", "wb")
+ofile.write(dec)
 ofile.close()
