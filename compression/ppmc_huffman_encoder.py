@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("dict_compressed.lz", "rb")
+ifile = open("bwt_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -146,7 +146,6 @@ class Trie:
 			if found:
 				freqs = [c.frequency for c in self.children if c.character not in excluded]
 				freqs.append(len(self.children))
-				# Encode character
 				enc += huffman_encoder(p, freqs)
 				return
 		else:
@@ -170,8 +169,19 @@ class Trie:
 		global enc, excluded
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size) if i not in excluded]
-			enc += huffman_encoder(len(freqs) - 1, freqs)
+			p = 0
+			for c in range(alphabet_size):
+				if c not in excluded:
+					if c == alphabet_size:
+						break
+					p += 1
+			enc += huffman_encoder(len(freqs) - 1, freqs)  # This isn't working (maybe we need alphabet_size + 1 after all)
 			return
+		if c_pos != 0:
+			for c in self.children:
+				if c.character == C[-c_pos]:
+					c.end_message(c_length, c_pos - 1)
+					return
 		if len(self.children) != 0:
 			freqs = [c.frequency for c in self.children if c.character not in excluded]
 			if len(freqs) == 0:
@@ -182,8 +192,6 @@ class Trie:
 			for c in self.children:
 				excluded[c.character] = True
 		root.end_message(c_length - 1, c_length - 1)
-
-
 
 root = Trie(None)
 
@@ -196,9 +204,9 @@ while i < len(m):
 	i += 1
 
 # End message by escaping N + 1 times (escapes out of order -1)
-C = [i for i in m[max(0, i - N) : i]]
-excluded = {}
-root.end_message(len(C), len(C))
+#C = [i for i in m[max(0, i - N) : i]]
+#excluded = {}
+#root.end_message(len(C), len(C))
 
 print("took", time.time() - start, "seconds")
 

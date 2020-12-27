@@ -4,7 +4,7 @@ import sys
 from bitstring import *
 
 # Read input file
-ifile = open("in.tex", "rb")
+ifile = open("bwt_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -50,9 +50,6 @@ while i < len(m):
 		child_chr = m[-1]  # figure out exactly what causes this (this solution causes issues)
 	else:
 		child_chr = m[i + l - 1]
-	if child_chr > 127:
-		print("oh no!")
-		input()
 	c = np.binary_repr(child_chr).zfill(character_bits)
 	# Add a new child in the trie
 	node.add_child(child_chr)
@@ -63,9 +60,7 @@ while i < len(m):
 	enc += p + c
 	i += l  # Continue encoding from the next unmatched character
 
-print(enc)
-
 # Write to output file
-ofile = open('compressed.lz', 'wb')
+ofile = open('lz78_out.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)  # enc is a binary string so should be written as such
 ofile.close()

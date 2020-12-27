@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -15,6 +15,8 @@ for i in range(len(enc)):
 	enc[i] += 1
 
 enc.append(end_symbol)
+
+start = time.time()
 
 for s in range(len(enc) - 3, -1, -1):
 	c = enc[s]
@@ -36,6 +38,8 @@ for s in range(len(enc) - 3, -1, -1):
 		i += 1
 	enc[r] = end_symbol
 
-ofile = open("bwt.lz", "w", newline='\n')
-ofile.write(str(enc, encoding="utf-8"))
+print("took", time.time() - start, "seconds")
+
+ofile = open("bwt_encoded.lz", "wb")
+ofile.write(enc)
 ofile.close()

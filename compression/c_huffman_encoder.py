@@ -108,6 +108,6 @@ enc = length_encoding + enc
 
 enc = np.binary_repr(length_bits).zfill(character_bits) + enc
 
-ofile = open('compressed.lz', 'wb')
+ofile = open('huffman_compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()

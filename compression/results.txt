@@ -11,3 +11,9 @@ dict_ppmc_huffman (dict encoding followed by ppmc_huffman) (encoding sherlock_sh
 
 dict_lzfg_ppmc_huffman:
 	N = 5: 41 mins,		328 KB	(unchecked)
+
+dict_bwt_ppmc_huffman: (times are for ppmc_huffman)
+	N = 5: A very very long time,	259 KB (unchecked)
+
+dict_bwt_lzfg_huffman: (times are for lzfg)
+	10.1342545033 mins,	274 KB (unchecked)

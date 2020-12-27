@@ -18,7 +18,7 @@ character_bits = 8
 
 literal_string = ""
 
-ifile = open("dict_compressed.lz", "rb")
+ifile = open("bwt_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
