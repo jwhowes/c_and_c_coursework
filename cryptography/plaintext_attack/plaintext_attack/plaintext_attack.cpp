@@ -25,6 +25,8 @@ int pairs[num_words * num_words][2];
 
 bool passed[num_words * num_words];
 
+bool found = false;
+
 const string path = "C:/Users/taydo/OneDrive/Documents/computer_science/year3/C_and_C/coursework/cryptography/";
 const char * exec_name = "C:/Users/taydo/OneDrive/Documents/computer_science/year3/C_and_C/coursework/cryptography/encrypt.exe";
 
@@ -39,7 +41,12 @@ void check_encrypt(char * plain, int index) {
 	// If plain encrypted = the first 8 bytes of the ciphertext then bool[i] = true
 		// where i is the position of pair in pairs
 	// if enc == "903408ec4d951acf", write index to file (we can recover the full plaintexts later)
-	passed[index] = enc == "903408ec4d951acf";
+	if (enc == "903408ec4d951acf") {
+		found = true;
+		ofstream ofile(path + "first_block_out.txt");
+		ofile << plain << "\n";
+		ofile.close();
+	}
 }
 
 bool eq(char * str1, char * str2) {
@@ -69,32 +76,30 @@ int main(){
 			pos++;
 		}
 	}
+	cout << "pairs loaded" << endl;
 	// Map check_encrypt over pairs
 	char plain[17];
 	for (int i = 0; i < num_words * num_words; i++) {
+		if (found) {
+			terminate();
+		}
 		string full = words[pairs[i][0]] + "." + words[pairs[i][1]];
-		string temp = full.substr(0, 8);
-		stringstream plain_hex;
-		for (string::size_type j = 0; j < temp.length(); j++) {
-			plain_hex << hex << (int)temp[j];
+		if (pairs[i][0] != pairs[i][1] && full.length() <= 11) {
+			string temp = full.substr(0, 8);
+			stringstream plain_hex;
+			for (string::size_type j = 0; j < temp.length(); j++) {
+				plain_hex << hex << (int)temp[j];
+			}
+			for (int j = 0; j < 16; j++) {
+				plain[j] = plain_hex.str()[j];
+			}
+			plain[16] = 0;
+			threads.emplace_back(thread(check_encrypt, plain, i));
 		}
-		for (int j = 0; j < 16; j++) {
-			plain[j] = plain_hex.str()[j];
-		}
-		plain[16] = 0;
-		threads.emplace_back(thread(check_encrypt, plain, i));
 	}
 	cout << "all threads started!" << endl;
 	for (auto & th : threads) {
 		th.join();
 	}
-	// Write pairs that pass to output file
-	for (int i = 0; i < num_words * num_words; i++) {
-		if (passed[i]) {
-			// write words[pairs[i][0]] + "." + words[pairs[i][1]] to output file
-		}
-	}
-	cout << "Time taken (ms): " << chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - start).count() << endl;
-	// Current best for 10 words is 10500192 ms
 	return 0;
 }
