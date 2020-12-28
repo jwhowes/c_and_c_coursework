@@ -8,10 +8,16 @@
 #include <array>
 #include <iostream>
 #include <chrono>
+#include <cstdio>
+#include <wchar.h>
+#include <process.h>
+#include <Windows.h>
+#include <thread>
+#include <vector>
 
 using namespace std;
 
-const int num_words = 10;
+const int num_words = 13495;
 
 string words[num_words];
 
@@ -20,19 +26,20 @@ int pairs[num_words * num_words][2];
 bool passed[num_words * num_words];
 
 const string path = "C:/Users/taydo/OneDrive/Documents/computer_science/year3/C_and_C/coursework/cryptography/";
+const char * exec_name = "C:/Users/taydo/OneDrive/Documents/computer_science/year3/C_and_C/coursework/cryptography/encrypt.exe";
 
-bool inline check_encrypt(char * plain, int index) {
+void check_encrypt(char * plain, int index) {
 	string enc = "";
-	/*FILE* pipe = _popen((path + "encrypt.exe " + plain).c_str(), "r");
+	FILE* pipe = _popen((path + "encrypt.exe " + plain).c_str(), "r");
 	char buffer[17];
 	if (pipe) {
 		fgets(buffer, sizeof buffer, pipe) != NULL;
 		enc += buffer;
-	}*/
-
+	}
 	// If plain encrypted = the first 8 bytes of the ciphertext then bool[i] = true
 		// where i is the position of pair in pairs
-	return enc == "903408ec4d951acf";
+	// if enc == "903408ec4d951acf", write index to file (we can recover the full plaintexts later)
+	passed[index] = enc == "903408ec4d951acf";
 }
 
 bool eq(char * str1, char * str2) {
@@ -45,6 +52,7 @@ bool eq(char * str1, char * str2) {
 }
 
 int main(){
+	vector<thread> threads;
 	auto start = chrono::high_resolution_clock::now();
 	ifstream ifile;
 	ifile.open(path + "words.txt");
@@ -58,16 +66,31 @@ int main(){
 		for (int j = 0; j < num_words; j++) {
 			pairs[pos][0] = i;
 			pairs[pos][1] = j;
-			passed[pos] = false;
 			pos++;
 		}
 	}
 	// Map check_encrypt over pairs
-	char last_plain[16];
+	char plain[17];
+	for (int i = 0; i < num_words * num_words; i++) {
+		string full = words[pairs[i][0]] + "." + words[pairs[i][1]];
+		string temp = full.substr(0, 8);
+		stringstream plain_hex;
+		for (string::size_type j = 0; j < temp.length(); j++) {
+			plain_hex << hex << (int)temp[j];
+		}
+		for (int j = 0; j < 16; j++) {
+			plain[j] = plain_hex.str()[j];
+		}
+		plain[16] = 0;
+		threads.emplace_back(thread(check_encrypt, plain, i));
+	}
+	cout << "all threads started!" << endl;
+	for (auto & th : threads) {
+		th.join();
+	}
+	/*char last_plain[17];
 	last_plain[0] = 0;
-	char new_plain[16];
-	//array<char, 16> last_plain = {'\0'};
-	//array<char, 16> new_plain;
+	char new_plain[17];
 	int last_passed = false;
 	for (int i = 0; i < num_words * num_words; i++) {
 		string full = words[pairs[i][0]] + "." + words[pairs[i][1]];
@@ -79,6 +102,7 @@ int main(){
 		for (int j = 0; j < 16; j++) {
 			new_plain[j] = plain_hex.str()[j];
 		}
+		new_plain[16] = 0;
 		if (last_plain[0] == 0) {
 			last_passed = check_encrypt(new_plain, i);
 			copy(begin(new_plain), end(new_plain), begin(last_plain));
@@ -94,7 +118,7 @@ int main(){
 				passed[i] = true;
 			}
 		}
-	}
+	}*/
 	// Write pairs that pass to output file
 	for (int i = 0; i < num_words * num_words; i++) {
 		if (passed[i]) {
