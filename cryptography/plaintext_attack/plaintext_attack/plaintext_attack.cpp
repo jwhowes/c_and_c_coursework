@@ -88,37 +88,6 @@ int main(){
 	for (auto & th : threads) {
 		th.join();
 	}
-	/*char last_plain[17];
-	last_plain[0] = 0;
-	char new_plain[17];
-	int last_passed = false;
-	for (int i = 0; i < num_words * num_words; i++) {
-		string full = words[pairs[i][0]] + "." + words[pairs[i][1]];
-		string temp = full.substr(0, 8);
-		stringstream plain_hex;
-		for (string::size_type i = 0; i < temp.length(); i++) {
-			plain_hex << hex << (int)temp[i];
-		}
-		for (int j = 0; j < 16; j++) {
-			new_plain[j] = plain_hex.str()[j];
-		}
-		new_plain[16] = 0;
-		if (last_plain[0] == 0) {
-			last_passed = check_encrypt(new_plain, i);
-			copy(begin(new_plain), end(new_plain), begin(last_plain));
-			passed[i] = true;
-		}
-		else {
-			bool e = eq(new_plain, last_plain);
-			if (!e) {
-				last_passed = check_encrypt(new_plain, i);
-				copy(begin(new_plain), end(new_plain), begin(last_plain));
-				passed[i] = true;
-			} else if (last_passed) {
-				passed[i] = true;
-			}
-		}
-	}*/
 	// Write pairs that pass to output file
 	for (int i = 0; i < num_words * num_words; i++) {
 		if (passed[i]) {
