@@ -16,6 +16,11 @@ def check_encrypt(plain):
 	p = subprocess.Popen("encrypt.exe " + plain[:8].hex(), stdout=subprocess.PIPE)
 	o = p.stdout.read()[:-2]
 	if o == b"903408ec4d951acf":
+		ofile = open("first_block_out.txt", "w")
+		ofile.write(plain)
+		ofile.close()
+		print("found in function")
+		exit()
 		return plain
 	return b""
 	'''if subprocess.run(["encrypt.exe", plain[:8].hex()], stdout=subprocess.PIPE).stdout[:-2] == b"a80f2c74f235484e":
@@ -26,7 +31,7 @@ if __name__ == '__main__':
 	start = time.time()
 	with multiprocessing.Pool(processes=16) as pool:
 
-		ifile = open("words_even_shorter.txt", "r")
+		ifile = open("words.txt", "r")
 		m = ifile.readlines()
 		ifile.close()
 
@@ -37,12 +42,12 @@ if __name__ == '__main__':
 		pos = 0
 		for i in range(len(m)):
 			for j in range(len(m)):
-				if len(m[i]) + len(m[j]) <= 12:
+				if len(m[i]) + len(m[j]) <= 11:
 					plaintexts.append((m[i][:-1] + "." + m[j][:-1]).encode())
-		plaintexts = np.array(plaintexts, dtype=bytearray)
+		plaintexts = np.array(plaintexts[::-1], dtype=bytearray)
 
 		print("got plaintexts")  # I got this far without crashing (i.e. doesn't use too much memory. Let's hope the rest won't either)
-		plaintexts = pool.map(check_encrypt, plaintexts)
+		shorter_plaintexts = pool.map(check_encrypt, plaintexts)
 	ofile = open("pairs.txt", "wb")
 	for i in plaintexts:
 		if i != b"":

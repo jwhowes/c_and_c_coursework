@@ -82,6 +82,7 @@ int main(){
 	for (int i = 0; i < num_words * num_words; i++) {
 		if (found) {
 			terminate();
+			return 0;
 		}
 		string full = words[pairs[i][0]] + "." + words[pairs[i][1]];
 		if (pairs[i][0] != pairs[i][1] && full.length() <= 11) {
