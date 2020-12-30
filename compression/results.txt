@@ -17,3 +17,12 @@ dict_bwt_ppmc_huffman: (times are for ppmc_huffman)
 
 dict_bwt_lzfg_huffman: (times are for lzfg)
 	10.1342545033 mins,	274 KB (unchecked)
+
+dict_bwt_lzfg_ppmc_huffman: (times are for lzfg + ppmc_huffman):
+	N = 3: 37 mins,		289 KB (unchecked) (interesting that it's worse than just huffman)
+
+With regards to Lempel-Ziv: LZW > LZFG > LZ77 > LZ78 (> in this context means better)
+
+It appears that when combined with LZ, bwt is pretty good but when combined with PPMC it doesn't quite match up. My guess would be that the dict encoder creates such strong contextual redundancy that bwt can't surpass it.
+Although bwt does have patches of repeated symbols, much of the document consists of blocks from which these repeated symbols are taken meaning they are more random and are less compressable.
+For certain compression methods this still results in an improvement (e.g. LZ or RLE), but for some methods (including PPM) this actually reduces compression effectiveness.

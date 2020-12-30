@@ -4,12 +4,12 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("bwt_encoded.lz", "rb")
+ifile = open("lzfg_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-N = 5
+N = 3
 
 C = ""
 i = 0
