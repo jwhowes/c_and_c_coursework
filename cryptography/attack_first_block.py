@@ -47,7 +47,7 @@ if __name__ == '__main__':
 		plaintexts = np.array(plaintexts[::-1], dtype=bytearray)
 
 		print("got plaintexts")  # I got this far without crashing (i.e. doesn't use too much memory. Let's hope the rest won't either)
-		shorter_plaintexts = pool.map(check_encrypt, plaintexts)
+		plaintexts = pool.map(check_encrypt, plaintexts)
 	ofile = open("pairs.txt", "wb")
 	for i in plaintexts:
 		if i != b"":
