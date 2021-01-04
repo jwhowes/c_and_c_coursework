@@ -14,18 +14,17 @@ using namespace std;
 
 __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint64_t * res_key, bool * done) {
 	// Generate first 3 bytes of the thread's key
-	uint64_t thread_key = (uint64_t)(blockIdx.x * blockDim.x + threadIdx.x);
+	uint64_t thread_key = (uint64_t)(blockIdx.x * blockDim.x + threadIdx.x) << 35;
+	const uint64_t bit_mask = 0x00FFFFF800000000;
 	uint64_t keys[16];
 	uint64_t PC1_permuted;
 	uint64_t C;
 	uint64_t D;
 	int v;
-	thread_key <<= 35;
 	//thread_key <<= 32;
 	// First three bytes of the thread key are now fixed
 	for (uint64_t i = 0; i < thread_encryptions; i++) {
-		thread_key >>= 35;
-		thread_key <<= 35;
+		thread_key &= bit_mask;
 		thread_key |= i;
 		// Encrypt plaintext with thread_key
 		// First, obtain key schedule
