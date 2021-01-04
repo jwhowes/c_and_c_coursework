@@ -6,7 +6,7 @@
 #include <iostream>
 
 __device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int len);
-__device__ void split_64(uint64_t src, uint64_t * left, uint64_t * right);
+__device__ void split_56(uint64_t src, uint64_t * left, uint64_t * right);
 __device__ void cycle_left(uint64_t * src, int amount, int len);
 
 __device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int len) {
@@ -18,10 +18,10 @@ __device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t
 	}
 }
 
-__device__ void split_64(uint64_t src, uint64_t * left, uint64_t * right) {
-	const uint64_t left_bit_mask = 0xffffffff00000000;
-	const uint64_t right_bit_mask = 0x00000000ffffffff;
-	*left = (src & left_bit_mask) >> 32;
+__device__ void split_56(uint64_t src, uint64_t * left, uint64_t * right) {
+	const uint64_t left_bit_mask = 0x00fffffff0000000;
+	const uint64_t right_bit_mask = 0x000000000fffffff;
+	*left = (src & left_bit_mask) >> 28;
 	*right = src & right_bit_mask;
 }
 

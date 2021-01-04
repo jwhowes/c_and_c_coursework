@@ -29,8 +29,8 @@ __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint
 		// Encrypt plaintext with thread_key
 		// First, obtain key schedule
 		permute(thread_key, PC_1, &PC1_permuted, 56);
-		/*split_64(PC1_permuted, &C, &D);  Need to rewrite now that thread_key is 56 bits
-		for (int j = 1; j <= 16; j++) {
+		split_56(PC1_permuted, &C, &D);
+		/*for (int j = 1; j <= 16; j++) {  Need to rewrite now that the key is 56 bits
 			if (j == 1 || j == 2 || j == 9 || j == 16) {
 				v = 1;
 			}else {
