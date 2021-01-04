@@ -4,12 +4,12 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("lzfg_encoded.lz", "rb")
+ifile = open("lzw_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-N = 3
+N = 2
 
 C = ""
 i = 0
@@ -169,6 +169,8 @@ class Trie:
 		global enc, excluded
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size) if i not in excluded]
+			if len(freqs) == 0:
+				return
 			p = 0
 			for c in range(alphabet_size):
 				if c not in excluded:
@@ -204,9 +206,9 @@ while i < len(m):
 	i += 1
 
 # End message by escaping N + 1 times (escapes out of order -1)
-#C = [i for i in m[max(0, i - N) : i]]
-#excluded = {}
-#root.end_message(len(C), len(C))
+C = [i for i in m[max(0, i - N) : i]]
+excluded = {}
+root.end_message(len(C), len(C))
 
 print("took", time.time() - start, "seconds")
 

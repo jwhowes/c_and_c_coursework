@@ -12,7 +12,7 @@ for i in range(len(latex_commands)):
 	latex_commands[i] = latex_commands[i].replace("\r", "")
 	latex_commands[i] = latex_commands[i].encode()
 
-ifile = open("bwt_out.lz", "rb")
+ifile = open("ppmc_out.lz", "rb")
 enc = ifile.read()
 ifile.close()
 

@@ -21,27 +21,27 @@ def check_encrypt(plain):
 
 if __name__ == '__main__':
 	start = time.time()
-	with multiprocessing.Pool(processes=128) as pool:
-		words_file = open("5_letter_words.txt", "r")
-		words = words_file.readlines()
-		words_file.close()
+	words_file = open("5_letter_words.txt", "r")
+	words = words_file.readlines()
+	words_file.close()
 
-		for w in range(len(words)):
-			words[w] = words[w].replace("\n", "")
-			words[w] = words[w].replace("\r", "")
+	for w in range(len(words)):
+		words[w] = words[w].replace("\n", "")
+		words[w] = words[w].replace("\r", "")
 
-		prefix_file = open("two_letter_prefixes.txt")
-		prefixes = prefix_file.readlines()
-		for p in range(len(prefixes)):
-			prefixes[p] = prefixes[p].replace("\n", "")
-			prefixes[p] = prefixes[p].replace("\r", "")
+	prefix_file = open("two_letter_prefixes.txt")
+	prefixes = prefix_file.readlines()
+	for p in range(len(prefixes)):
+		prefixes[p] = prefixes[p].replace("\n", "")
+		prefixes[p] = prefixes[p].replace("\r", "")
 
-		plaintexts = []
-		for i in range(len(words)):
-			for j in range(len(prefixes)):
-				plaintexts.append((words[i] + "." + prefixes[j]).encode())
-		
-		print("got plaintexts")
+	plaintexts = []
+	for i in range(len(words)):
+		for j in range(len(prefixes)):
+			plaintexts.append((words[i] + "." + prefixes[j]).encode())
+	
+	print("got plaintexts")
+	with multiprocessing.Pool(processes=64) as pool:
 		plaintexts = pool.map(check_encrypt, plaintexts)
 	ofile = open("first_block.txt", "wb")
 	for i in plaintexts:

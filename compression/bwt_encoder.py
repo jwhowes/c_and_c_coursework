@@ -4,17 +4,22 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("dict_compressed.lz", "rb")
-m = ifile.read()
-ifile.close()
+#ifile = open("dict_compressed.lz", "rb")
+#m = ifile.read()
+#ifile.close()
 
 end_symbol = 0
 
-enc = bytearray(m)
-for i in range(len(enc)):
-	enc[i] += 1
+#enc = bytearray(m)
+#for i in range(len(enc)):
+#	enc[i] += 1
+#
+#enc.append(end_symbol)
 
-enc.append(end_symbol)
+m = b"\xfftest"
+
+m += b"\x00"
+enc = bytearray(m)
 
 start = time.time()
 

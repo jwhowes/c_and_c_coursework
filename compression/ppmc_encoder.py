@@ -52,7 +52,6 @@ def arithmetic_coder(low_cum_freq, high_cum_freq):
 	a = int(a_bin, 2)
 	b = int(b_bin, 2)
 	return ret
-	# Need to add rescaling
 
 class Trie:
 	def __init__(self, character):

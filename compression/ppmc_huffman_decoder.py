@@ -138,6 +138,8 @@ class Trie:
 		global dec, excluded
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size) if i not in excluded]
+			if len(freqs) == 0:
+				return False
 			x = huffman_decoder(freqs)
 			if x is None or x == len(freqs) - 1:
 				return False

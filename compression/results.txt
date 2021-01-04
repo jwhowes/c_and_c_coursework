@@ -21,6 +21,8 @@ dict_bwt_lzfg_huffman: (times are for lzfg)
 dict_bwt_lzfg_ppmc_huffman: (times are for lzfg + ppmc_huffman):
 	N = 3: 37 mins,		289 KB (unchecked) (interesting that it's worse than just huffman)
 
+An idea for a workflow combining all steps: dict_LZW_bwt_ppmc_huffman (may require LZW to be modified to never output 255 (can be done in a similar way to dict))
+
 With regards to Lempel-Ziv: LZW > LZFG > LZ77 > LZ78 (> in this context means better)
 
 It appears that when combined with LZ, bwt is pretty good but when combined with PPMC it doesn't quite match up. My guess would be that the dict encoder creates such strong contextual redundancy that bwt can't surpass it.

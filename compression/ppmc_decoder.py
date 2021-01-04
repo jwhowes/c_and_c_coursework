@@ -20,12 +20,12 @@ N = 2
 C = ""
 i = 0
 
+neg_one_freqs = [1 for _ in range(alphabet_size + 1)]
+
 precision = 32
 a = 0
 b = 2**precision - 1
 decode_pos = 0
-
-neg_one_freqs = [1 for _ in range(alphabet_size + 1)]
 
 def arithmetic_decoder(frequencies):
 	global a, b, decode_pos, cntr
@@ -112,7 +112,6 @@ while True:
 	if not root.get_character(len(C), len(C)):
 		break
 	print(dec)
-	input()
 	root.add_character()
 	i += 1
 

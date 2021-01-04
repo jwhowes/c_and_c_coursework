@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 

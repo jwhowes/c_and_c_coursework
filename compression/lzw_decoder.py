@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("huffman_out.lz", "rb")
+ifile = open("compressed.lz", "rb")
 b = ifile.read()
 ifile.close()
 
@@ -58,6 +58,6 @@ dec = dec[:-1]
 
 print("took", time.time() - start, "seconds")
 
-ofile = open("out.tex", "wb")
+ofile = open("ppmc_out.lz", "wb")
 ofile.write(dec)
 ofile.close()
