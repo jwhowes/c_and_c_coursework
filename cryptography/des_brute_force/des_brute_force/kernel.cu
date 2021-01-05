@@ -13,13 +13,49 @@
 using namespace std;
 
 __device__ void f(uint64_t right, uint64_t key, uint64_t * ret) {
+	*ret = 0;
+	const uint64_t row_mask = 0x21;
+	const uint64_t col_mask = 0x1e;
+	const uint64_t last_6 = 0x3f;
+	uint64_t temp;
 	// We're just assuming all the permutations work
-	permute(right, E, ret, 48);  // E goes from length 32 to length 48 (not sure if this call will work)
-	*ret ^= key;
+	permute(right, E, &temp, 48);  // E goes from length 32 to length 48 (not sure if this call will work)
+	temp ^= key;
 	// Apply S-boxes
-	for (int i = 0; i < 6; i++) {
-
+	for (int i = 0; i < 8; i++) {
+		int row = 0;
+		int col = 0;
+		// Get the last 6 bits of temp
+		uint64_t row_bits = temp & row_mask;
+		uint64_t col_bits = (temp & col_mask) >> 1;
+		// Find row and column
+		if (row_bits % 2 == 1) {
+			row++;
+		}
+		if ((row_bits >> 5) % 2 == 1) {
+			row += 2;
+		}
+		if (col_bits % 2 == 1) {
+			col++;
+		}
+		col_bits >>= 1;
+		if (col_bits % 2 == 1) {
+			col += 2;
+		}
+		col_bits >>= 1;
+		if (col_bits % 2 == 1) {
+			col += 4;
+		}
+		col_bits >>= 1;
+		if (col_bits % 2 == 1) {
+			col += 8;
+		}
+		// Write the value of S box to *ret (I think maybe we have to write at the start, not at the end
+		*ret |= S[i][row * 16 + col];
+		*ret <<= 4;
+		temp >>= 6;
 	}
+	*ret >>= 4;
 	// Apply P permutation
 	permute(*ret, P, ret, 32);
 }
@@ -31,6 +67,11 @@ __device__ void des_encrypt(uint64_t block, uint64_t * keys, uint64_t * ret) {
 __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint64_t * res_key, bool * done) {
 	// Generate first 3 bytes of the thread's key
 	uint64_t thread_key = (uint64_t)(blockIdx.x * blockDim.x + threadIdx.x) << 35;
+	if (blockIdx.x * blockDim.x + threadIdx.x == 0) {
+		uint64_t f_value;
+		uint64_t right = 27;
+		f(right, thread_key, &f_value);
+	}
 	//const uint64_t bit_mask = 0x00FFFFF800000000;
 	uint64_t keys[16];
 	uint64_t PC1_permuted;

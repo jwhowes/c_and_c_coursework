@@ -19,8 +19,8 @@ __device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t
 }
 
 __device__ void split_56(uint64_t src, uint64_t * left, uint64_t * right) {
-	const uint64_t left_bit_mask = 0x00fffffff0000000;
-	const uint64_t right_bit_mask = 0x000000000fffffff;
+	const uint64_t left_bit_mask = 0xfffffff0000000;
+	const uint64_t right_bit_mask = 0xfffffff;
 	*left = (src & left_bit_mask) >> 28;
 	*right = src & right_bit_mask;
 }
