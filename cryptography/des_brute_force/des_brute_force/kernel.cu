@@ -61,7 +61,18 @@ __device__ void f(uint64_t right, uint64_t key, uint64_t * ret) {
 }
 
 __device__ void des_encrypt(uint64_t block, uint64_t * keys, uint64_t * ret) {
-
+	uint64_t left;
+	uint64_t right;
+	uint64_t next_left;
+	uint64_t f_temp;
+	split_64(block, &left, &right);
+	for (int i = 0; i < 16; i++) {
+		next_left = right;
+		f(right, keys[i], &f_temp);
+		right = left ^ f_temp;
+		left = next_left;
+	}
+	*ret = (right << 32) | left;
 }
 
 __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint64_t * res_key, bool * done) {
@@ -99,6 +110,7 @@ __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint
 			cycle_left(&D, v, 28);
 		}
 		des_encrypt(plaintext, keys, &temp);
+		printf("%llu\n", temp);
 		if (temp == ciphertext) {
 			*done = true;
 			*res_key = ciphertext;
