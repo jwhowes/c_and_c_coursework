@@ -15,7 +15,6 @@ __device__ void f(uint64_t right, uint64_t key, uint64_t * ret) {
 	*ret = 0;
 	const uint64_t row_mask = 0x21;
 	const uint64_t col_mask = 0x1e;
-	const uint64_t last_6 = 0x3f;
 	uint64_t temp;
 	// We're just assuming all the permutations work
 	permute(right, E, &temp, 48, 32);  // E goes from length 32 to length 48 (not sure if this call will work)
@@ -76,7 +75,7 @@ __device__ void des_encrypt(uint64_t block, uint64_t * keys, uint64_t * ret) {
 
 __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint64_t block_key, uint64_t * res_key, bool * done) {
 	// Generate first 3 bytes of the thread's key
-	uint64_t thread_key = block_key + ((uint64_t)(blockIdx.x * blockDim.x + threadIdx.x) << 35);
+	uint64_t thread_key = block_key + (uint64_t)(blockIdx.x * blockDim.x + threadIdx.x);
 	//const uint64_t bit_mask = 0x00FFFFF800000000;
 	uint64_t keys[16];
 	uint64_t PC1_permuted;
@@ -106,11 +105,10 @@ __global__ void brute_force_kernel(uint64_t plaintext, uint64_t ciphertext, uint
 
 	if (temp == ciphertext) {
 		*done = true;
-		*res_key = ciphertext;
-		return;
+		*res_key = thread_key;
+		printf("The key is: %llu\n", thread_key);
 	}
 }
-
 
 int main() {
 	uint64_t plaintext = 0x0123456789abcdef;
@@ -128,7 +126,7 @@ int main() {
 	cudaMalloc(&done, sizeof(bool));
 	cudaMemcpy(done, false, sizeof(bool), cudaMemcpyHostToDevice);
 	for (uint64_t i = 0; i < (uint64_t)1 << 46; i++) {
-		brute_force_kernel <<<1, 1024>>> (plaintext, ciphertext, i << 46, res_key, done);
+		brute_force_kernel <<<1, 1024>>> (plaintext, ciphertext, i << 10, res_key, done);
 	}
 	printf("All blocks started\n");
 	cudaDeviceSynchronize();
