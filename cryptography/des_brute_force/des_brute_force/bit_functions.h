@@ -5,17 +5,16 @@
 #include <stdint.h>
 #include <iostream>
 
-__device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int len);
+__device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int permutation_len, int src_len);
 __device__ void split_56(uint64_t src, uint64_t * left, uint64_t * right);
 __device__ void split_64(uint64_t src, uint64_t * left, uint64_t * right);
 __device__ void cycle_left(uint64_t * src, int amount, int len);
 
-__device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int len) {
+__device__ __host__ void permute(uint64_t src, const int * permutation, uint64_t * dst, int permutation_len, int src_len) {  // I'm fairly sure it works
 	*dst = 0;
-	for (int i = 0; i < len; i++) {
+	for (int i = 0; i < permutation_len; i++) {
 		// We set the ith bit of dst to the permutation[i]th bit of src
-		*dst |= (uint64_t)(((src >> permutation[i]) & 0x1) << i);
-		//*dst |= (uint64_t)((src >> (len - i) & 0x1) << permutation[i]);  // I'm fairly certain this is correct
+		*dst |= (uint64_t)(((src >> (src_len - permutation[i] - 1)) & 0x1) << (permutation_len - i - 1));
 	}
 }
 
