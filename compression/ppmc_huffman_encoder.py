@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("lzw_compressed.lz", "rb")
+ifile = open("in.tex", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -206,11 +206,12 @@ while i < len(m):
 	i += 1
 
 # End message by escaping N + 1 times (escapes out of order -1)
-C = [i for i in m[max(0, i - N) : i]]
-excluded = {}
-root.end_message(len(C), len(C))
+#C = [i for i in m[max(0, i - N) : i]]
+#excluded = {}
+#root.end_message(len(C), len(C))
 
 print("took", time.time() - start, "seconds")
+print(enc)
 
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
