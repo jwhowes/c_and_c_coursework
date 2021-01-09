@@ -33,6 +33,12 @@ for byte in m:
 	else:
 		count += 1
 
+tfile = open("compressed.lz", "rb")
+print(len(tfile.read()))
+tfile.close()
+
+print(len(enc))
+
 ofile = open("rle_compressed.lz", "wb")
 ofile.write(enc)
 ofile.close()

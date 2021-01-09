@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-ifile = open("ff_removed.lz", "rb")
+ifile = open("bit_stuffed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -10,7 +10,7 @@ m = bytearray(m)
 for i in range(len(m)):
 	m[i] += 1
 
-block_size = 2000
+block_size = 2048
 
 end_symbol = 0
 eof_byte = end_symbol.to_bytes(1, 'little')
@@ -42,8 +42,6 @@ while pos < len(m):
 			i += 1
 		block[r] = end_symbol
 	enc += block
-	print(block)
-	input()
 	pos += block_size
 
 print("took", time.time() - start, "seconds")
