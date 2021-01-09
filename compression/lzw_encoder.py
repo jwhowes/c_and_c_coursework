@@ -4,15 +4,14 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("dict_compressed.lz", "rb")
+ifile = open("ff_removed.lz", "rb")
 m = ifile.read()
 ifile.close()
-
 
 eof_byte = 255
 
 character_bits = 8
-reference_bits = 16
+reference_bits = 9
 
 m += eof_byte.to_bytes(1, 'little')
 
@@ -49,14 +48,14 @@ start = time.time()
 
 enc = ""
 i = 0
-while m[i] != eof_byte:
-	I = bytearray()
-	root.read_string()
+while i < len(m):
 	if num_entries == max_dict_entries:
 		num_entries = -1
 		root = Trie(None)
 		for j in range(256):
 			root.children.append(Trie(j))
+	I = bytearray()
+	root.read_string()
 
 enc += np.binary_repr(eof_byte).zfill(reference_bits)
 

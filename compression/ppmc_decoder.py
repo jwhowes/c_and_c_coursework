@@ -16,59 +16,52 @@ for i in b:
 
 dec = bytearray()
 
-N = 2
+N = 5
 
 C = ""
 i = 0
 
 precision = 32
 
-low = 0
-high = (2**precision) - 1
-buffer = int(enc[:precision], 2)
-next_bit_pos = 32
+full_range = 1 << precision
+half_range = full_range >> 1
+quarter_range = half_range >> 1
+state_mask = full_range - 1
 
-cntr = 0
+
+low = 0
+high = full_range - 1
+next_bit_pos = precision
+offset = 0
 
 def arithmetic_decoder(freqs):
-	global low, high, buffer, next_bit_pos, cntr
+	global low, high, offset, enc
 	s = sum(freqs)
 	freqs = [0] + freqs
 	for i in range(1, len(freqs)):
 		freqs[i] += freqs[i - 1]
-	r = high - low + 1
-	offset = buffer - low
-	value = ((offset + 1) * s - 1) // r
+	buffer = enc[offset : offset + precision]
+	b_int = int(buffer, 2)
+	value = math.floor((((b_int - low + 1) * s) - 1) / (high - low + 1))
 	symbol = 0
-	for i in range(1, len(freqs)):
-		if freqs[i] > value:
-			break
+	while freqs[symbol] <= value:
 		symbol += 1
-	newlow = low + (freqs[symbol] * r) // s
-	newhigh = (low + (freqs[symbol + 1] * r) // s) - 1
+	symbol -= 1
+	newlow = math.floor(low + ((high - low + 1) * freqs[symbol]) / s)
+	newhigh = math.floor(low + (((high - low + 1) * freqs[symbol + 1]) / s) - 1)
 	lo_bin = np.binary_repr(newlow).zfill(precision)
 	hi_bin = np.binary_repr(newhigh).zfill(precision)
-	b_bin = np.binary_repr(buffer).zfill(precision)
 	while lo_bin[0] == hi_bin[0]:
 		lo_bin = lo_bin[1:] + "0"
 		hi_bin = hi_bin[1:] + "1"
-		if next_bit_pos < len(enc):
-			b_bin = b_bin[1:] + enc[next_bit_pos]
-			next_bit_pos += 1
-		else:
-			b_bin = b_bin[1:] + "0"
-	while lo_bin[0] == "0" and lo_bin[1] == "1" and hi_bin[0] == "1" and hi_bin[1] == "0":
-		cntr += 1
+		offset += 1
+	while lo_bin[1] == "1" and hi_bin[1] == "0":
 		lo_bin = lo_bin[0] + lo_bin[2:] + "0"
 		hi_bin = hi_bin[0] + hi_bin[2:] + "1"
-		if next_bit_pos < len(enc):
-			b_bin = b_bin[0] + b_bin[2:] + enc[next_bit_pos]
-			next_bit_pos += 1
-		else:
-			b_bin = b_bin[0] + b_bin[2:] + "0"
+		# I feel like this next line could be made way more efficient (but need to figure out exactly what it does)
+		enc = enc[:offset] + str(1 - int(enc[offset + 1])) + enc[offset + 2:]
 	low = int(lo_bin, 2)
 	high = int(hi_bin, 2)
-	buffer = int(b_bin, 2)
 	return symbol
 
 excluded = {}
@@ -100,10 +93,7 @@ class Trie:
 		global dec, excluded
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
-			if len(freqs) == 0:
-				return False
 			x = arithmetic_decoder(freqs)
-			print(x)
 			if x is None or x == len(freqs) - 1:
 				return False
 			pos = 0
@@ -113,6 +103,8 @@ class Trie:
 						x = c
 						break
 					pos += 1
+			if x == len(freqs) - 1:
+				return False
 			dec.append(x)
 			return True
 		if c_pos == 0:
@@ -146,7 +138,6 @@ class Trie:
 root = Trie(None)
 
 start = time.time()
-
 while True:
 	C = [i for i in dec[max(0, i - N) : i]]
 	excluded = {}
@@ -157,8 +148,6 @@ while True:
 
 print("took", time.time() - start, "seconds")
 
-#print(dec)
-
-ofile = open("out.lz", "wb")
+ofile = open("ppmc_out.lz", "wb")
 ofile.write(dec)
 ofile.close()

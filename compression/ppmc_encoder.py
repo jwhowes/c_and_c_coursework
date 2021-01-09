@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("rle_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -18,34 +18,44 @@ enc = ""
 
 precision = 32
 
+full_range = 1 << precision
+half_range = full_range >> 1
+quarter_range = half_range >> 1
+state_mask = full_range - 1
+
 low = 0
-high = (2**precision) - 1
+high = (1 << precision) - 1
 underflow_cntr = 0
 
-def arithmetic_encoder(low_prob, high_prob):
+def arithmetic_encoder(low_cum_freq, high_cum_freq, total):
 	global low, high, underflow_cntr
 	ret = ""
 	r = high - low + 1
-	newlow = low + math.floor(low_prob * r)
-	newhigh = low + math.floor(high_prob * r) - 1
-	lo_bin = np.binary_repr(newlow).zfill(precision)
-	hi_bin = np.binary_repr(newhigh).zfill(precision)
-	while lo_bin[0] == hi_bin[0]:
-		bit = lo_bin[0]
-		ret += bit
-		lo_bin = lo_bin[1:] + "0"
-		hi_bin = hi_bin[1:] + "1"
-		if underflow_cntr > 0:
-			for _ in range(underflow_cntr):
-				ret += str(1 - int(bit))
-			underflow_cntr = 0
-	while lo_bin[0] == "0" and lo_bin[1] == "1" and hi_bin[0] == "1" and hi_bin[1] == "0":
+	newlow = low + low_cum_freq * r // total
+	newhigh = low + high_cum_freq * r // total - 1
+	low = newlow; high = newhigh
+	while ((low ^ high) & half_range) == 0:
+		bit = low >> (precision - 1)
+		ret += str(bit)
+		for _ in range(underflow_cntr):
+			ret += str(bit ^ 1)
+		underflow_cntr = 0
+		low = ((low << 1) & state_mask)
+		high = ((high << 1) & state_mask) | 1
+	while (low & ~high & quarter_range) != 0:
 		underflow_cntr += 1
-		lo_bin = lo_bin[0] + lo_bin[2:] + "0"
-		hi_bin = hi_bin[0] + hi_bin[2:] + "1"
-	low = int(lo_bin, 2)
-	high = int(hi_bin, 2)
+		low = (low << 1) ^ half_range
+		high = ((high ^ half_range) << 1) | half_range | 1
 	return ret
+
+def end_float():
+	global low, enc, underflow_cntr
+	lo_bin = np.binary_repr(low).zfill(precision)
+	enc += lo_bin[0]
+	while underflow_cntr > 0:
+		enc += str(1 - int(lo_bin[0]))
+		underflow_cntr -= 1
+	enc += lo_bin[1:]
 
 excluded = {}
 
@@ -84,8 +94,7 @@ class Trie:
 					if c == m[i]:
 						break
 					low += 1
-			print(low/len(freqs), (low + 1)/len(freqs))
-			enc += arithmetic_encoder(low/len(freqs), (low + 1)/len(freqs))
+			enc += arithmetic_encoder(low, low + 1, sum(freqs))
 			return
 		if c_pos == 0:
 			low = 0
@@ -99,7 +108,7 @@ class Trie:
 				freqs = [c.frequency for c in self.children if c.character not in excluded]
 				freqs.append(len(self.children))
 				s = sum(freqs)
-				enc += arithmetic_encoder(low/s, (low + c.frequency)/s)
+				enc += arithmetic_encoder(low, low + c.frequency, s)
 				return
 		else:
 			for c in self.children:
@@ -115,7 +124,7 @@ class Trie:
 				return
 			freqs.append(len(self.children))
 			s = sum(freqs)
-			enc += arithmetic_encoder((s - len(self.children))/s, 1)
+			enc += arithmetic_encoder(s - len(self.children), s, s)
 			for c in self.children:
 				excluded[c.character] = True
 		root.get_code(c_length - 1, c_length - 1)
@@ -123,7 +132,7 @@ class Trie:
 root = Trie(None)
 
 m = list(m)
-m.append(256)
+m.append(alphabet_size)
 
 start = time.time()
 while i < len(m):
@@ -132,10 +141,11 @@ while i < len(m):
 	root.get_code(len(C), len(C))
 	root.add_character()
 	i += 1
-# End message by escaping N + 1 times (escapes out of order -1) TODO
+
+end_float()
 
 print("took", time.time() - start, "seconds")
 
-ofile = open('compressed.lz', 'wb')
+ofile = open('ppmc_compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()

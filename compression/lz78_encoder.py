@@ -4,7 +4,7 @@ import sys
 from bitstring import *
 
 # Read input file
-ifile = open("in.tex", "rb")
+ifile = open("bwt_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
