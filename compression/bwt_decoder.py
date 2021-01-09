@@ -46,8 +46,8 @@ while n - dec_pos > 2:
 		p = q
 
 dec = dec[:-1]
-#for i in range(len(dec)):
-#	dec[i] -= 1
+for i in range(len(dec)):
+	dec[i] -= 1
 
 print(dec)
 

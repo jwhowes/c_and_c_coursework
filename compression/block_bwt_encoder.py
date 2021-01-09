@@ -42,30 +42,11 @@ while pos < len(m):
 			i += 1
 		block[r] = end_symbol
 	enc += block
+	print(block)
+	input()
 	pos += block_size
 
 print("took", time.time() - start, "seconds")
-
-
-'''def rotate(s):
-	return s[1:] + s[0].to_bytes(1, 'little')
-
-start = time.time()
-
-pos = 0
-while pos < len(m):
-	block = m[pos : pos + block_size]
-	rotations = [b"" for i in range(block_size)]
-	rotations[0] = m
-	for i in range(1, block_size):
-		rotations[i] = rotate(rotations[i - 1])
-
-	rotations.sort()
-	for r in rotations:
-		enc.append(r[-1])
-	pos += block_size
-
-print("took", time.time() - start, "seconds")'''
 
 ofile = open("test_bwt.lz", "wb")
 ofile.write(enc)
