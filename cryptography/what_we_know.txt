@@ -2,5 +2,4 @@ THE BELOW ASSUMES THE WORDS ARE IN THE DICTIONARY I CREATED
 
 The first word is not 6 letters
 
-The first word is not in the first thousand 5 letter words (only took 3.5 hours to check that)
-	- If I check the next 2 thousand it should only take 7 hours (then there's only a thousand more to check)
+The first word is not in the first 3000 5 letter words
