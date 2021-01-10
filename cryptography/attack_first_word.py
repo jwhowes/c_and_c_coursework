@@ -22,7 +22,7 @@ def check_encrypt(plain):
 if __name__ == '__main__':
 	start = time.time()
 	with multiprocessing.Pool(processes=64) as pool:
-		words_file = open("second_two_thousand_5_letter_words.txt", "r")
+		words_file = open("last_thousand_5_letter_words.txt", "r")
 		words = words_file.readlines()
 		words_file.close()
 

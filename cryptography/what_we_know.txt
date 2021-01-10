@@ -2,4 +2,6 @@ THE BELOW ASSUMES THE WORDS ARE IN THE DICTIONARY I CREATED
 
 The first word is not 6 letters
 
-The first word is not in the first 3000 5 letter words
+The first word is not 5 letters
+
+Assuming the words are in the dictionary, the first word is 4 letters
