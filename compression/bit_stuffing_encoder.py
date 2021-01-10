@@ -1,7 +1,7 @@
 import numpy as np
 from bitstring import *
 
-ifile = open("compressed.lz", "rb")
+ifile = open("ppmc_compressed.lz", "rb")
 b = ifile.read()
 ifile.close()
 
@@ -25,6 +25,9 @@ for bit in m:
 			enc += "1"
 		enc += "0"
 		count = 0
+
+# Append a 1 for EOF
+enc += "1"
 
 ofile = open("bit_stuffed.lz", "wb")
 BitArray(bin=enc).tofile(ofile)

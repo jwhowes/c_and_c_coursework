@@ -4,7 +4,7 @@ import sys
 from bitstring import *
 
 character_bits = 8
-num_characters = 2**character_bits
+num_characters = 2**character_bits + 1
 
 ifile = open("compressed.lz", "rb")
 b = ifile.read()
@@ -47,20 +47,13 @@ codewords = dict([(v, k) for k, v in codewords.items()])
 v = ""
 while i < len(enc):
 	if v in codewords:
+		if codewords[v] == 256:
+			break
 		dec.append(codewords[v])
 		v = ""
 	else:
 		v += enc[i]
 		i += 1
-
-#while i < len(enc):
-#	v = ""
-#	l = 1
-#	while v == "" or (int(v, 2) < first[l] and i < len(enc)):
-#		v += enc[i]
-#		l += 1
-#		i += 1
-#	v = int(v, 2)
 
 ofile = open("huffman_out.lz", "wb")
 ofile.write(dec)

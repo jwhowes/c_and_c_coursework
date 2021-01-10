@@ -4,7 +4,7 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("compressed.lz", "rb")
+ifile = open("bit_stuffed_out.lz", "rb")
 b = ifile.read()
 ifile.close()
 
@@ -94,8 +94,6 @@ class Trie:
 		if c_length == -1:
 			freqs = [1 for i in range(alphabet_size + 1) if i not in excluded]
 			x = arithmetic_decoder(freqs)
-			if x is None or x == len(freqs) - 1:
-				return False
 			pos = 0
 			for c in range(alphabet_size + 1):
 				if c not in excluded:
@@ -103,7 +101,7 @@ class Trie:
 						x = c
 						break
 					pos += 1
-			if x == len(freqs) - 1:
+			if x == alphabet_size:
 				return False
 			dec.append(x)
 			return True

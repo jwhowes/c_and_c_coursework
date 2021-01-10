@@ -4,12 +4,12 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("rle_compressed.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-N = 2
+N = 5
 
 C = ""
 i = 0

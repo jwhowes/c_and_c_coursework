@@ -1,6 +1,6 @@
 import numpy as np
 
-ifile = open("test_bwt.lz", "rb")
+ifile = open("bwt_encoded.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -32,6 +32,13 @@ for byte in m:
 		count = 0
 	else:
 		count += 1
+
+if count < min_count:
+	for _ in range(count):
+		enc.append(curr_byte)
+else:
+	for _ in range(min_count):
+		enc.append(curr_byte)
 
 ofile = open("rle_compressed.lz", "wb")
 ofile.write(enc)

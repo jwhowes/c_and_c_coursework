@@ -9,8 +9,11 @@ ifile.close()
 
 character_bits = 8
 
-A = np.zeros((2**(character_bits + 1)), dtype=int)
-num_characters = 2**character_bits
+m = list(m)
+m.append(2**character_bits)
+
+A = np.zeros(2*(2**character_bits + 1), dtype=int)
+num_characters = 2**character_bits + 1
 
 for i in m:
 	A[i + num_characters] += 1
@@ -108,6 +111,6 @@ enc = length_encoding + enc
 
 enc = np.binary_repr(length_bits).zfill(character_bits) + enc
 
-ofile = open('huffman_compressed.lz', 'wb')
+ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()

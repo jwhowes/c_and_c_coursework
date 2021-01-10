@@ -2,11 +2,11 @@ import numpy as np
 import time
 import heapq
 
-ifile = open("test_bwt.lz", "rb")
+ifile = open("rle_out.lz", "rb")
 enc = ifile.read()
 ifile.close()
 
-block_size = 2000
+block_size = 2048
 end_symbol = 0
 eof_byte = end_symbol.to_bytes(1, 'little')
 

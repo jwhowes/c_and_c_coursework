@@ -3,6 +3,10 @@ import math
 import sys
 import csv
 
+ifile = open("ppmc_out.lz", "rb")
+enc = ifile.read()
+ifile.close()
+
 dict_file = open("latex_dict.txt", "r")
 latex_commands = dict_file.readlines()
 dict_file.close()
@@ -12,10 +16,6 @@ for i in range(len(latex_commands)):
 	latex_commands[i] = latex_commands[i].replace("\r", "")
 	latex_commands[i] = latex_commands[i].encode()
 
-ifile = open("ppmc_out.lz", "rb")
-enc = ifile.read()
-ifile.close()
-
 dec = bytearray()
 
 inv_dict = {}
@@ -24,7 +24,7 @@ second_byte = 0
 for i in range(len(latex_commands)):
 	inv_dict[first_byte * 256 + second_byte] = latex_commands[i]
 	second_byte += 1
-	if second_byte == 255:
+	if second_byte == 256:
 		second_byte = 0
 		first_byte += 1
 

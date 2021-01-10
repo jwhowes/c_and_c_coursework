@@ -3,6 +3,10 @@ import math
 import sys
 import csv
 
+ifile = open("in.tex", "rb")
+m = ifile.read()
+ifile.close()
+
 dict_file = open("latex_dict.txt", "r")
 latex_commands = dict_file.readlines()
 dict_file.close()
@@ -19,13 +23,9 @@ second_byte = 0
 for i in range(len(latex_commands)):
 	latex_dict[latex_commands[i]] = (first_byte * 256 + second_byte).to_bytes(2, 'big')
 	second_byte += 1
-	if second_byte == 255:
+	if second_byte == 256:
 		second_byte = 0
 		first_byte += 1
-
-ifile = open("in.tex", "rb")
-m = ifile.read()
-ifile.close()
 
 class Trie:
 	def __init__(self, character):
