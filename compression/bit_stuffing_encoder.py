@@ -1,7 +1,7 @@
 import numpy as np
 from bitstring import *
 
-ifile = open("ppmc_compressed.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 b = ifile.read()
 ifile.close()
 

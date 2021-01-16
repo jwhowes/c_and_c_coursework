@@ -2,9 +2,10 @@ import numpy as np
 import math
 import sys
 import time
+import pickle
 from bitstring import *
 
-ifile = open("bit_stuffed_out.lz", "rb")
+ifile = open("compressed.lz", "rb")
 b = ifile.read()
 ifile.close()
 
@@ -16,22 +17,15 @@ for i in b:
 
 dec = bytearray()
 
-N = 5
+N = 4
 
 C = ""
 i = 0
 
 precision = 32
 
-full_range = 1 << precision
-half_range = full_range >> 1
-quarter_range = half_range >> 1
-state_mask = full_range - 1
-
-
 low = 0
-high = full_range - 1
-next_bit_pos = precision
+high = (1 << precision) - 1
 offset = 0
 
 def arithmetic_decoder(freqs):
@@ -133,7 +127,13 @@ class Trie:
 					return c.get_character(c_length, c_pos - 1)
 		return True
 
-root = Trie(None)
+#root = Trie(None)
+
+objfile = open("ppmc_dict.pickle", "rb")
+root = pickle.load(objfile)
+objfile.close()
+
+print("read root")
 
 start = time.time()
 while True:

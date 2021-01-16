@@ -44,8 +44,6 @@ while pos < len(m):
 	enc += block
 	pos += block_size
 
-print(len(block))
-
 print("took", time.time() - start, "seconds")
 
 ofile = open("bwt_encoded.lz", "wb")
