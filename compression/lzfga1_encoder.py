@@ -18,7 +18,7 @@ character_bits = 8
 
 literal_string = ""
 
-ifile = open("bwt_encoded.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -61,7 +61,15 @@ if len(literal_string) > 0:
 	for j in literal_string:
 		enc += np.binary_repr(ord(j)).zfill(character_bits)
 
-print("took", time.time() - start, " seconds")
+print("took", time.time() - start, "seconds")
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc))/float(len(o)), "bpc")
 
 ofile = open('lzfg_encoded.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)

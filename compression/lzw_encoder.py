@@ -4,14 +4,14 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("ff_removed.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 eof_byte = 255
 
 character_bits = 8
-reference_bits = 9
+reference_bits = 16
 
 m += eof_byte.to_bytes(1, 'little')
 
@@ -60,6 +60,14 @@ while i < len(m):
 enc += np.binary_repr(eof_byte).zfill(reference_bits)
 
 print("took", time.time() - start, "seconds")
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc))/float(len(o)), "bpc")
 
 ofile = open("lzw_compressed.lz", "wb")
 BitArray(bin=enc).tofile(ofile)

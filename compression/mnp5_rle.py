@@ -1,6 +1,6 @@
 import numpy as np
 
-ifile = open("bwt_encoded.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -39,6 +39,14 @@ if count < min_count:
 else:
 	for _ in range(min_count):
 		enc.append(curr_byte)
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc)*8)/float(len(o)), "bpc")
 
 ofile = open("rle_compressed.lz", "wb")
 ofile.write(enc)

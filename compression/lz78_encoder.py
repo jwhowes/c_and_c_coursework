@@ -4,7 +4,7 @@ import sys
 from bitstring import *
 
 # Read input file
-ifile = open("bwt_encoded.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -12,7 +12,7 @@ ifile.close()
 max_dict_count = 2**16 - 1
 dict_count = 0
 
-character_bits = 7
+character_bits = 8
 index_bits = math.ceil(math.log(max_dict_count + 1, 2))
 
 class Trie:
@@ -59,6 +59,14 @@ while i < len(m):
 	# Add the token (p, c) to the output (where p is position in the dictionary of the longest match and c is the character immediately following this matched)
 	enc += p + c
 	i += l  # Continue encoding from the next unmatched character
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc))/float(len(o)), "bpc")
 
 # Write to output file
 ofile = open('lz78_out.lz', 'wb')

@@ -3,11 +3,11 @@ import math
 import sys
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
-W = 2**8 - 1
+W = 2**12 - 1
 L = 2**8 - 1
 W_bits = math.ceil(math.log(W + 1, 2))
 L_bits = math.ceil(math.log(L + 1, 2))
@@ -41,6 +41,15 @@ def lz77_encode(m):
 	return ret
 
 enc = lz77_encode(m)
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc))/float(len(o)), "bpc")
+
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)
 ofile.close()

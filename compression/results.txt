@@ -1,28 +1,29 @@
-ppmc_huffman (encoding sherlock_shorter (originally 754 KB))
-	N = 2: 12 mins,		280 KB	(checked)
-	N = 4: 9.39 mins,	227 KB	(checked)
-	N = 5: 8.56 mins,	224 KB	(checked)
-	N = 6: 9.83 mins,	225 KB	(checked)
-	N = 7: 9.39 mins,	226 KB	(checked)
-	N = 8: 10.65 mins,	228 KB	(checked)
+dict->ppmc (initialised):
+	N = 4:	2.018 bpc
 
-ppmc:
-	N = 5: 3 mins,		201 KB (checked), decoding takes about 10 mins
+dict->ppmc (unitialised):
+	N = 4:	2.073 bpc
 
-dict_ppmc_huffman (dict encoding followed by ppmc_huffman) (encoding sherlock_shorter) (times are for ppmc_huffman):
-	N = 5: 12.18 mins	213 KB	(checked)
+ppmc (unitialised) (no dict encoding first):
+	N = 4:	2.165 bpc
+	N = 5:	2.125 bpc
+	N = 6:	2.144 bpc
 
-dict_lzfg_ppmc_huffman:
-	N = 5: 41 mins,		328 KB	(unchecked)
+COMPRESSING dict_compressed:
+mnp5:	5.065 bpc
+lz77:	
+lz78:	3.332 bpc
+lzfg:	3.535 bpc
+lzw:	3.204 bpc
+ppmc:	2.073 bpc	(N=4)
 
-dict_bwt_ppmc_huffman: (times are for ppmc_huffman)
-	N = 5: A very very long time,	259 KB (unchecked)
-
-dict_bwt_lzfg_huffman: (times are for lzfg)
-	10.1342545033 mins,	274 KB (unchecked)
-
-dict_bwt_lzfg_ppmc_huffman: (times are for lzfg + ppmc_huffman):
-	N = 3: 37 mins,		289 KB (unchecked) (interesting that it's worse than just huffman)
+COMPRESSING og_bwt_encoded (the encoded dict version):
+mnp5:	3.305 bpc
+lz77:	6.387 bpc	(need to redo, I had the wrong parameters when I was doing this)
+lz78:	3.095 bpc
+lzfg:	3.152 bpc
+lzw:	3.175 bpc
+ppmc:	2.447 bpc	(N=5)
 
 An idea for a workflow combining all steps: dict_LZW_bwt_ppmc_huffman (may require LZW to be modified to never output 255 (can be done in a similar way to dict))
 
