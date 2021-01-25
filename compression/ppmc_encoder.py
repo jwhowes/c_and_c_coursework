@@ -5,12 +5,12 @@ import time
 import pickle
 from bitstring import *
 
-ifile = open("og_bwt_encoded.lz", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-N = 5
+N = 4
 
 C = ""
 i = 0
@@ -131,11 +131,11 @@ class Trie:
 		#root.get_code(c_length - 1, c_length - 1)
 		return False
 
-root = Trie(None)
+#root = Trie(None)
 
-#objfile = open("ppmc_dict.pickle", "rb")
-#root = pickle.load(objfile)
-#objfile.close()
+objfile = open("ppmc_dict.pickle", "rb")
+root = pickle.load(objfile)
+objfile.close()
 
 m = list(m)
 m.append(alphabet_size)
@@ -161,8 +161,8 @@ orig = open("in.tex", "rb")
 o = orig.read()
 orig.close()
 
-print("input:", len(m))
-print("output (bits):", len(o))
+print("input:", len(o))
+print("output (bits):", len(enc))
 print(float(len(enc))/float(len(o)), "bpc")
 
 ofile = open('compressed.lz', 'wb')

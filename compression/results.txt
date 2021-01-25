@@ -4,6 +4,9 @@ dict->ppmc (initialised):
 dict->ppmc (unitialised):
 	N = 4:	2.073 bpc
 
+dict->ppmc_huffman(unitialised):
+	N = 4:	2.238 bpc
+
 ppmc (unitialised) (no dict encoding first):
 	N = 4:	2.165 bpc
 	N = 5:	2.125 bpc

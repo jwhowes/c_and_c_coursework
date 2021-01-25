@@ -4,12 +4,12 @@ import sys
 import time
 from bitstring import *
 
-ifile = open("in.tex", "rb")
+ifile = open("dict_compressed.lz", "rb")
 m = ifile.read()
 ifile.close()
 
 alphabet_size = 256
-N = 2
+N = 4
 
 C = ""
 i = 0
@@ -206,12 +206,20 @@ while i < len(m):
 	i += 1
 
 # End message by escaping N + 1 times (escapes out of order -1)
-#C = [i for i in m[max(0, i - N) : i]]
-#excluded = {}
-#root.end_message(len(C), len(C))
+C = [i for i in m[max(0, i - N) : i]]
+excluded = {}
+root.end_message(len(C), len(C))
 
 print("took", time.time() - start, "seconds")
-print(enc)
+
+orig = open("in.tex", "rb")
+o = orig.read()
+orig.close()
+
+print("input:", len(m))
+print("output (bits):", len(o))
+print(float(len(enc))/float(len(o)), "bpc")
+
 
 ofile = open('compressed.lz', 'wb')
 BitArray(bin=enc).tofile(ofile)

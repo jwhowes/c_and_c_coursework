@@ -3,7 +3,7 @@ import math
 import sys
 import csv
 
-ifile = open("in.tex", "rb")
+ifile = open("sherlock_shorter.tex", "rb")
 m = ifile.read()
 ifile.close()
 
@@ -18,7 +18,7 @@ for i in range(len(latex_commands)):
 
 latex_dict = {}
 
-first_byte = 129
+first_byte = 128
 second_byte = 0
 for i in range(len(latex_commands)):
 	latex_dict[latex_commands[i]] = (first_byte * 256 + second_byte).to_bytes(2, 'big')

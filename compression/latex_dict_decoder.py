@@ -19,7 +19,7 @@ for i in range(len(latex_commands)):
 dec = bytearray()
 
 inv_dict = {}
-first_byte = 129
+first_byte = 128
 second_byte = 0
 for i in range(len(latex_commands)):
 	inv_dict[first_byte * 256 + second_byte] = latex_commands[i]
